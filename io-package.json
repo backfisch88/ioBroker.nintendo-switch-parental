@@ -1,0 +1,126 @@
+{
+	"common": {
+		"name": "nintendo-switch-parental",
+		"version": "0.0.1",
+		"news": {
+			"0.0.1": {
+				"en": "initial release",
+				"de": "Erstveröffentlichung",
+				"ru": "Начальная версия",
+				"pt": "lançamento inicial",
+				"nl": "Eerste uitgave",
+				"fr": "Première version",
+				"it": "Versione iniziale",
+				"es": "Versión inicial",
+				"pl": "Pierwsze wydanie",
+				"uk": "Початкова версія",
+				"zh-cn": "首次出版"
+			}
+		},
+		"titleLang": {
+			"en": "Nintendo Switch Parental Controls",
+			"de": "Nintendo Switch Parental Controls",
+			"ru": "Nintendo Switch Parental Controls",
+			"pt": "Nintendo Switch Parental Controls",
+			"nl": "Nintendo Switch Parental Controls",
+			"fr": "Nintendo Switch Parental Controls",
+			"it": "Nintendo Switch Parental Controls",
+			"es": "Nintendo Switch Parental Controls",
+			"pl": "Nintendo Switch Parental Controls",
+			"uk": "Nintendo Switch Parental Controls",
+			"zh-cn": "Nintendo Switch Parental Controls"
+		},
+		"desc": {
+			"en": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+			"de": "Nintendo Switch Kindersicherung überwachen und steuern (Spielzeit, Limits, Schlafenszeit)",
+			"ru": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+			"pt": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+			"nl": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+			"fr": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+			"it": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+			"es": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+			"pl": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+			"uk": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+			"zh-cn": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)"
+		},
+		"authors": [
+			"Henrik Schönhofen <henrik.schoenhofen@gmx.de>"
+		],
+		"keywords": [
+			"nintendo",
+			"switch",
+			"parental controls",
+			"kindersicherung",
+			"play time",
+			"screen time"
+		],
+		"licenseInformation": {
+			"type": "free",
+			"license": "MIT"
+		},
+		"platform": "Javascript/Node.js",
+		"icon": "nintendo-switch-parental.png",
+		"enabled": true,
+		"extIcon": "https://raw.githubusercontent.com/backfisch88/ioBroker.nintendo-switch-parental/main/admin/nintendo-switch-parental.png",
+		"readme": "https://github.com/backfisch88/ioBroker.nintendo-switch-parental/blob/main/README.md",
+		"loglevel": "info",
+		"tier": 3,
+		"mode": "daemon",
+		"type": "multimedia",
+		"compact": true,
+		"connectionType": "cloud",
+		"dataSource": "poll",
+		"adminUI": {
+			"config": "json"
+		},
+		"dependencies": [
+			{
+				"js-controller": ">=6.0.11"
+			}
+		],
+		"globalDependencies": [
+			{
+				"admin": ">=7.0.23"
+			}
+		],
+		"messagebox": true
+	},
+	"native": {
+		"sessionToken": "",
+		"redirectUrl": "",
+		"pollInterval": 300,
+		"timezone": "Europe/Berlin",
+		"language": "de-DE",
+		"createApplicationStates": false
+	},
+	"objects": [],
+	"instanceObjects": [
+		{
+			"_id": "info",
+			"type": "channel",
+			"common": {
+				"name": "Information"
+			},
+			"native": {}
+		},
+		{
+			"_id": "info.connection",
+			"type": "state",
+			"common": {
+				"role": "indicator.connected",
+				"name": "Device or service connected",
+				"type": "boolean",
+				"read": true,
+				"write": false,
+				"def": false
+			},
+			"native": {}
+		}
+	],
+	"protectedNative": [
+		"sessionToken"
+	],
+	"encryptedNative": [
+		"sessionToken"
+	]
+}

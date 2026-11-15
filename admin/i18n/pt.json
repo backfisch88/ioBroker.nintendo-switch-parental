@@ -1,0 +1,16 @@
+{
+	"Nintendo Account login": "Início de sessão na conta Nintendo",
+	"loginHelp": "1. Clique em \"Criar link de início de sessão\" e entre com a sua conta Nintendo. 2. Na página \"Linking an External Account\", clique com o botão direito em \"Select this person\" e copie o endereço do link (não clique nele). 3. Cole o link abaixo e clique em \"Concluir início de sessão\".",
+	"Create login link": "Criar link de início de sessão",
+	"Copied link (npf...://auth#...)": "Link copiado (npf...://auth#...)",
+	"Complete login": "Concluir início de sessão",
+	"Session token (filled automatically)": "Token de sessão (preenchido automaticamente)",
+	"Settings": "Definições",
+	"Poll interval (seconds)": "Intervalo de consulta (segundos)",
+	"Timezone (IANA)": "Fuso horário (IANA)",
+	"e.g. Europe/Berlin": "p. ex. Europe/Berlin",
+	"Language tag": "Etiqueta de idioma",
+	"e.g. de-DE": "p. ex. de-DE",
+	"Create states for each game (allow list, play time)": "Criar estados para cada jogo (lista de permissões, tempo de jogo)",
+	"Login link (alternative: copy and open in a browser)": "Link de início de sessão (alternativa: copiar e abrir no navegador)"
+}

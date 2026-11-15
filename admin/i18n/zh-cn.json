@@ -1,0 +1,16 @@
+{
+	"Nintendo Account login": "Nintendo 账户登录",
+	"loginHelp": "1. 点击“创建登录链接”并使用 Nintendo 账户登录。2. 在“Linking an External Account”页面上，右键点击“Select this person”并复制链接地址（不要直接点击）。3. 将链接粘贴到下方并点击“完成登录”。",
+	"Create login link": "创建登录链接",
+	"Copied link (npf...://auth#...)": "已复制的链接 (npf...://auth#...)",
+	"Complete login": "完成登录",
+	"Session token (filled automatically)": "会话令牌（自动填写）",
+	"Settings": "设置",
+	"Poll interval (seconds)": "轮询间隔（秒）",
+	"Timezone (IANA)": "时区 (IANA)",
+	"e.g. Europe/Berlin": "例如 Europe/Berlin",
+	"Language tag": "语言标签",
+	"e.g. de-DE": "例如 de-DE",
+	"Create states for each game (allow list, play time)": "为每个游戏创建状态（允许列表、游戏时间）",
+	"Login link (alternative: copy and open in a browser)": "登录链接（备选：复制并在浏览器中打开）"
+}

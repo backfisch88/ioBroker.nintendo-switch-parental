@@ -1,0 +1,16 @@
+{
+	"Nintendo Account login": "Вход в аккаунт Nintendo",
+	"loginHelp": "1. Нажмите «Создать ссылку для входа» и войдите в аккаунт Nintendo. 2. На странице «Linking an External Account» щёлкните правой кнопкой по «Select this person» и скопируйте адрес ссылки (не нажимайте на неё). 3. Вставьте ссылку ниже и нажмите «Завершить вход».",
+	"Create login link": "Создать ссылку для входа",
+	"Copied link (npf...://auth#...)": "Скопированная ссылка (npf...://auth#...)",
+	"Complete login": "Завершить вход",
+	"Session token (filled automatically)": "Токен сессии (заполняется автоматически)",
+	"Settings": "Настройки",
+	"Poll interval (seconds)": "Интервал опроса (секунды)",
+	"Timezone (IANA)": "Часовой пояс (IANA)",
+	"e.g. Europe/Berlin": "напр. Europe/Berlin",
+	"Language tag": "Языковой тег",
+	"e.g. de-DE": "напр. de-DE",
+	"Create states for each game (allow list, play time)": "Создавать состояния для каждой игры (список разрешённых, время игры)",
+	"Login link (alternative: copy and open in a browser)": "Ссылка для входа (альтернатива: скопировать и открыть в браузере)"
+}

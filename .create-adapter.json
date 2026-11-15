@@ -1,0 +1,39 @@
+{
+	"cli": true,
+	"target": "directory",
+	"adapterName": "nintendo-switch-parental",
+	"title": "Nintendo Switch Parental Controls",
+	"description": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
+	"authorName": "Henrik Schoenhofen",
+	"authorGithub": "backfisch88",
+	"authorEmail": "henrik.schoenhofen@icloud.com",
+	"gitRemoteProtocol": "HTTPS",
+	"dependabot": "yes",
+	"license": "MIT License",
+	"releaseScript": "yes",
+	"gitCommit": "no",
+	"defaultBranch": "main",
+	"startMode": "daemon",
+	"features": [
+		"adapter"
+	],
+	"connectionIndicator": "yes",
+	"type": "multimedia",
+	"adminFeatures": [],
+	"adminUi": "json",
+	"eslintConfig": "official",
+	"language": "JavaScript",
+	"tools": [
+		"ESLint",
+		"type checking"
+	],
+	"indentation": "Tab",
+	"quotes": "single",
+	"expert": "yes",
+	"connectionType": "cloud",
+	"dataSource": "poll",
+	"nodeVersion": "22",
+	"devServer": "no",
+	"replay": "/home/claude/work/replay.json",
+	"creatorVersion": "3.1.5"
+}

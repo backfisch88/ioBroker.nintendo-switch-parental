@@ -1,0 +1,16 @@
+{
+	"Nintendo Account login": "Logowanie do konta Nintendo",
+	"loginHelp": "1. Kliknij „Utwórz link logowania” i zaloguj się na konto Nintendo. 2. Na stronie „Linking an External Account” kliknij prawym przyciskiem „Select this person” i skopiuj adres linku (nie klikaj go). 3. Wklej link poniżej i kliknij „Zakończ logowanie”.",
+	"Create login link": "Utwórz link logowania",
+	"Copied link (npf...://auth#...)": "Skopiowany link (npf...://auth#...)",
+	"Complete login": "Zakończ logowanie",
+	"Session token (filled automatically)": "Token sesji (wypełniany automatycznie)",
+	"Settings": "Ustawienia",
+	"Poll interval (seconds)": "Interwał odpytywania (sekundy)",
+	"Timezone (IANA)": "Strefa czasowa (IANA)",
+	"e.g. Europe/Berlin": "np. Europe/Berlin",
+	"Language tag": "Znacznik języka",
+	"e.g. de-DE": "np. de-DE",
+	"Create states for each game (allow list, play time)": "Twórz stany dla każdej gry (lista dozwolonych, czas gry)",
+	"Login link (alternative: copy and open in a browser)": "Link logowania (alternatywa: skopiuj i otwórz w przeglądarce)"
+}

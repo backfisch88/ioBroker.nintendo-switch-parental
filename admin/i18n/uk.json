@@ -1,0 +1,16 @@
+{
+	"Nintendo Account login": "Вхід в обліковий запис Nintendo",
+	"loginHelp": "1. Натисніть «Створити посилання для входу» та увійдіть в обліковий запис Nintendo. 2. На сторінці «Linking an External Account» клацніть правою кнопкою на «Select this person» і скопіюйте адресу посилання (не натискайте на нього). 3. Вставте посилання нижче та натисніть «Завершити вхід».",
+	"Create login link": "Створити посилання для входу",
+	"Copied link (npf...://auth#...)": "Скопійоване посилання (npf...://auth#...)",
+	"Complete login": "Завершити вхід",
+	"Session token (filled automatically)": "Токен сесії (заповнюється автоматично)",
+	"Settings": "Налаштування",
+	"Poll interval (seconds)": "Інтервал опитування (секунди)",
+	"Timezone (IANA)": "Часовий пояс (IANA)",
+	"e.g. Europe/Berlin": "напр. Europe/Berlin",
+	"Language tag": "Мовний тег",
+	"e.g. de-DE": "напр. de-DE",
+	"Create states for each game (allow list, play time)": "Створювати стани для кожної гри (список дозволених, час гри)",
+	"Login link (alternative: copy and open in a browser)": "Посилання для входу (альтернатива: скопіювати й відкрити в браузері)"
+}

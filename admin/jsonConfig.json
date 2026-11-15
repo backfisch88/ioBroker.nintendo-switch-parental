@@ -1,0 +1,106 @@
+{
+	"i18n": true,
+	"type": "panel",
+	"items": {
+		"_loginHeader": {
+			"type": "header",
+			"text": "Nintendo Account login",
+			"size": 3,
+			"newLine": true,
+			"xs": 12
+		},
+		"_loginHelp": {
+			"type": "staticText",
+			"text": "loginHelp",
+			"newLine": true,
+			"xs": 12
+		},
+		"_loginLink": {
+			"type": "textSendTo",
+			"command": "getLoginText",
+			"container": "text",
+			"copyToClipboard": true,
+			"label": "Login link (alternative: copy and open in a browser)",
+			"newLine": true,
+			"xs": 12
+		},
+		"_getLoginUrl": {
+			"type": "sendTo",
+			"command": "getLoginUrl",
+			"label": "Create login link",
+			"variant": "outlined",
+			"newLine": true,
+			"xs": 12,
+			"sm": 6,
+			"md": 4,
+			"openUrl": true,
+			"window": "Nintendo Login"
+		},
+		"redirectUrl": {
+			"type": "text",
+			"label": "Copied link (npf...://auth#...)",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 8
+		},
+		"_completeLogin": {
+			"type": "sendTo",
+			"command": "completeLogin",
+			"jsonData": "{\"redirectUrl\":\"${data.redirectUrl}\"}",
+			"label": "Complete login",
+			"variant": "contained",
+			"newLine": true,
+			"xs": 12,
+			"sm": 6,
+			"md": 4
+		},
+		"sessionToken": {
+			"type": "password",
+			"label": "Session token (filled automatically)",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 8
+		},
+		"_settingsHeader": {
+			"type": "header",
+			"text": "Settings",
+			"size": 3,
+			"newLine": true,
+			"xs": 12
+		},
+		"pollInterval": {
+			"type": "number",
+			"label": "Poll interval (seconds)",
+			"min": 60,
+			"max": 3600,
+			"newLine": true,
+			"xs": 12,
+			"sm": 6,
+			"md": 4
+		},
+		"timezone": {
+			"type": "text",
+			"label": "Timezone (IANA)",
+			"help": "e.g. Europe/Berlin",
+			"xs": 12,
+			"sm": 6,
+			"md": 4
+		},
+		"language": {
+			"type": "text",
+			"label": "Language tag",
+			"help": "e.g. de-DE",
+			"xs": 12,
+			"sm": 6,
+			"md": 4
+		},
+		"createApplicationStates": {
+			"type": "checkbox",
+			"label": "Create states for each game (allow list, play time)",
+			"newLine": true,
+			"xs": 12
+		}
+	}
+}

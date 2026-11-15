@@ -1,0 +1,16 @@
+{
+	"Nintendo Account login": "Nintendo-Account-Anmeldung",
+	"loginHelp": "1. Auf \"Login-Link erstellen\" klicken und mit dem Nintendo-Account anmelden. 2. Auf der Seite \"Externes Konto verknüpfen\" mit der rechten Maustaste auf \"Diese Person auswählen\" klicken und die Linkadresse kopieren (nicht anklicken). 3. Den Link unten einfügen und auf \"Anmeldung abschließen\" klicken.",
+	"Create login link": "Login-Link erstellen",
+	"Copied link (npf...://auth#...)": "Kopierter Link (npf...://auth#...)",
+	"Complete login": "Anmeldung abschließen",
+	"Session token (filled automatically)": "Session-Token (wird automatisch gefüllt)",
+	"Settings": "Einstellungen",
+	"Poll interval (seconds)": "Abfrageintervall (Sekunden)",
+	"Timezone (IANA)": "Zeitzone (IANA)",
+	"e.g. Europe/Berlin": "z. B. Europe/Berlin",
+	"Language tag": "Sprachkürzel",
+	"e.g. de-DE": "z. B. de-DE",
+	"Create states for each game (allow list, play time)": "Datenpunkte pro Spiel anlegen (Freigabeliste, Spielzeit)",
+	"Login link (alternative: copy and open in a browser)": "Login-Link (Alternative: kopieren und im Browser öffnen)"
+}

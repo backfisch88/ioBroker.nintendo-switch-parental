@@ -1,0 +1,16 @@
+{
+	"Nintendo Account login": "Inloggen met Nintendo-account",
+	"loginHelp": "1. Klik op \"Inloglink maken\" en log in met je Nintendo-account. 2. Klik op de pagina \"Linking an External Account\" met de rechtermuisknop op \"Select this person\" en kopieer het linkadres (niet aanklikken). 3. Plak de link hieronder en klik op \"Inloggen voltooien\".",
+	"Create login link": "Inloglink maken",
+	"Copied link (npf...://auth#...)": "Gekopieerde link (npf...://auth#...)",
+	"Complete login": "Inloggen voltooien",
+	"Session token (filled automatically)": "Sessietoken (wordt automatisch ingevuld)",
+	"Settings": "Instellingen",
+	"Poll interval (seconds)": "Pollinginterval (seconden)",
+	"Timezone (IANA)": "Tijdzone (IANA)",
+	"e.g. Europe/Berlin": "bijv. Europe/Berlin",
+	"Language tag": "Taalcode",
+	"e.g. de-DE": "bijv. de-DE",
+	"Create states for each game (allow list, play time)": "Statussen per spel aanmaken (toegestane lijst, speeltijd)",
+	"Login link (alternative: copy and open in a browser)": "Inloglink (alternatief: kopiëren en in de browser openen)"
+}

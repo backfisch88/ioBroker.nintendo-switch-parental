@@ -1,0 +1,16 @@
+{
+	"Nintendo Account login": "Accesso all'account Nintendo",
+	"loginHelp": "1. Fai clic su \"Crea link di accesso\" e accedi con il tuo account Nintendo. 2. Nella pagina \"Linking an External Account\" fai clic con il tasto destro su \"Select this person\" e copia l'indirizzo del link (non cliccarci sopra). 3. Incolla il link qui sotto e fai clic su \"Completa accesso\".",
+	"Create login link": "Crea link di accesso",
+	"Copied link (npf...://auth#...)": "Link copiato (npf...://auth#...)",
+	"Complete login": "Completa accesso",
+	"Session token (filled automatically)": "Token di sessione (compilato automaticamente)",
+	"Settings": "Impostazioni",
+	"Poll interval (seconds)": "Intervallo di interrogazione (secondi)",
+	"Timezone (IANA)": "Fuso orario (IANA)",
+	"e.g. Europe/Berlin": "ad es. Europe/Berlin",
+	"Language tag": "Tag lingua",
+	"e.g. de-DE": "ad es. de-DE",
+	"Create states for each game (allow list, play time)": "Crea stati per ogni gioco (elenco consentiti, tempo di gioco)",
+	"Login link (alternative: copy and open in a browser)": "Link di accesso (alternativa: copiare e aprire nel browser)"
+}
