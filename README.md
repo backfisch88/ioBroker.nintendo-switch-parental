@@ -1,20 +1,23 @@
 ![Logo](admin/nintendo-switch-parental.png)
+
 # ioBroker.nintendo-switch-parental
 
 [![NPM version](https://img.shields.io/npm/v/iobroker.nintendo-switch-parental.svg)](https://www.npmjs.com/package/iobroker.nintendo-switch-parental)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.nintendo-switch-parental.svg)](https://www.npmjs.com/package/iobroker.nintendo-switch-parental)
-![Number of Installations](https://iobroker.live/badges/nintendo-switch-parental-installed.svg)
-![Current version in stable repository](https://iobroker.live/badges/nintendo-switch-parental-stable.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![NPM](https://nodei.co/npm/iobroker.nintendo-switch-parental.png?downloads=true)](https://nodei.co/npm/iobroker.nintendo-switch-parental/)
-
-**Tests:** ![Test and Release](https://github.com/backfisch88/ioBroker.nintendo-switch-parental/workflows/Test%20and%20Release/badge.svg)
-
-## Nintendo Switch Parental Controls adapter for ioBroker
-
-I use this adapter to read and change the settings of the [Nintendo Switch Parental Controls](https://www.nintendo.com/switch/parental-controls/) from ioBroker: play time, daily limit, extra time, bedtime and more. It works for Nintendo Switch and Nintendo Switch 2 and talks to Nintendo's cloud, the same service the official smartphone app uses. The cloud API and the login flow are ported from the [pynintendoparental](https://github.com/pantherale0/pynintendoparental) library behind the Home Assistant integration.
+Unofficial [Nintendo Switch Parental Controls](https://www.nintendo.com/switch/parental-controls/) integration for ioBroker. I use it to read and change play time, daily limit, extra time, bedtime and more. It works for Nintendo Switch and Nintendo Switch 2 and talks to Nintendo's cloud, the same service the official smartphone app uses. The cloud API and the login flow are ported from [pynintendoparental](https://github.com/pantherale0/pynintendoparental), the library behind the Home Assistant integration.
 
 **Nintendo** and **Nintendo Switch** are trademarks of Nintendo. This project is not affiliated with or endorsed by Nintendo. The API is not public and Nintendo may change or block it at any time.
+
+## Features
+
+- Play time today and this month, time remaining, last sync per console
+- Daily limit, timer mode (daily / per weekday) and suspend-software mode
+- Extra time: add or cancel
+- Bedtime start and end
+- Restriction level (age rating)
+- Play time per player and, optionally, per game (with allow list)
+- Polling every 1-60 minutes (default 5), commands are sent immediately
 
 ## Requirements
 
@@ -22,16 +25,28 @@ I use this adapter to read and change the settings of the [Nintendo Switch Paren
 - A Nintendo Account that is the parent/guardian of at least one console in the Nintendo Switch Parental Controls app
 - The console has to be online for Nintendo to receive the current play time
 
-## Setup
+## Installation
 
-1. Create an instance and open its settings.
-2. Click **Create login link**. A Nintendo login page opens.
-3. Sign in with your Nintendo Account. On the page *Linking an External Account*, right-click **Select this person** and copy the link address. Do not click the button.
-4. Paste the link into **Copied link** and click **Complete login**.
+Install via ioBroker Admin UI.
 
-The adapter stores the session token encrypted and restarts. Nothing else is needed. If Nintendo ever revokes the token, the log tells you to sign in again.
+## Configuration
 
-## States
+Open the instance settings and sign in with your Nintendo Account:
+
+1. Click **Create login link**. A Nintendo login page opens.
+2. Sign in. On the page *Linking an External Account*, right-click **Select this person** and copy the link address. Do not click the button.
+3. Paste the link into **Copied link** and click **Complete login**.
+
+The session token is stored encrypted and the adapter restarts. If Nintendo ever revokes the token, the log tells you to sign in again.
+
+| Setting | Description |
+|---------|-------------|
+| Poll interval | Seconds between cloud reads (60-3600, default 300) |
+| Timezone | Used for "today" and the weekday limits (default Europe/Berlin) |
+| Language | Nintendo cloud language (default de-DE) |
+| Create states for each game | Creates `apps.<applicationId>.*` per game |
+
+## Datapoints
 
 Per console under `devices.<deviceId>`:
 
@@ -61,8 +76,9 @@ While extra time is active, the adapter refuses to change the limit, bedtime, su
 
 ## Notes
 
-- The data is polled from the cloud every 5 minutes by default (minimum 60 seconds). Commands are sent immediately and the console is re-read afterwards.
 - Settings changed here reach the console the next time it connects to the internet.
+- While extra time is active, the adapter refuses to change the limit, bedtime, suspend mode and timer mode. Cancel the extra time first.
+- Invalid values are refused with a warning and the state returns to the real value.
 - Changing the PIN is not supported.
 
 ## Changelog
@@ -71,31 +87,17 @@ While extra time is active, the adapter refuses to change the limit, bedtime, su
 	### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.0.1 (2026-11-15)
 - (backfisch88) initial release
 
 ## License
+
 MIT License
 
 Copyright (c) 2026 Henrik Schönhofen (backfisch88) <henrik.schoenhofen@icloud.com>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+See [LICENSE](LICENSE) for the full license text.
 
 ## Credits
+
 The cloud API and login flow follow [pynintendoparental](https://github.com/pantherale0/pynintendoparental) (MIT, Justin Hammond) and [pynintendoauth](https://pypi.org/project/pynintendoauth/).
