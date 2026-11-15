@@ -21,7 +21,7 @@ Unofficial [Nintendo Switch Parental Controls](https://www.nintendo.com/switch/p
 
 ## Requirements
 
-- Node.js 22 or newer, js-controller 6.0.11 or newer, admin 7.0.23 or newer
+- Node.js 22 or newer, js-controller 6.0.11 or newer, admin 7.6.20 or newer
 - A Nintendo Account that is the parent/guardian of at least one console in the Nintendo Switch Parental Controls app
 - The console has to be online for Nintendo to receive the current play time
 
@@ -85,11 +85,17 @@ While extra time is active, the adapter refuses to change the limit, bedtime, su
 
 ### **WORK IN PROGRESS**
 
+### 0.0.3 (2026-11-15)
+- (backfisch88) Fix: admin dependency raised to 7.6.20
+
 ### 0.0.2 (2026-11-15)
 - (backfisch88) test release (npm publishing)
 
-### 0.0.1 (2026-11-15)
-- (backfisch88) initial release
+Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
+
+## Credits
+
+The cloud API and login flow follow [pynintendoparental](https://github.com/pantherale0/pynintendoparental) (MIT, Justin Hammond) and [pynintendoauth](https://pypi.org/project/pynintendoauth/).
 
 ## License
 
@@ -98,7 +104,3 @@ MIT License
 Copyright (c) 2026 Henrik Schönhofen (backfisch88) <henrik.schoenhofen@icloud.com>
 
 See [LICENSE](LICENSE) for the full license text.
-
-## Credits
-
-The cloud API and login flow follow [pynintendoparental](https://github.com/pantherale0/pynintendoparental) (MIT, Justin Hammond) and [pynintendoauth](https://pypi.org/project/pynintendoauth/).

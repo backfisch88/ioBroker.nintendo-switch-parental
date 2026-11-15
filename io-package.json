@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "nintendo-switch-parental",
-		"version": "0.0.2",
+		"version": "0.0.3",
 		"news": {
+			"0.0.3": {
+				"en": "Fix: admin dependency raised to 7.6.20",
+				"de": "Fix: Admin-Abhängigkeit auf 7.6.20 erhöht",
+				"ru": "Исправление: зависимость admin повышена до 7.6.20",
+				"pt": "Correção: dependência do admin elevada para 7.6.20",
+				"nl": "Fix: admin-afhankelijkheid verhoogd naar 7.6.20",
+				"fr": "Correction : dépendance admin relevée à 7.6.20",
+				"it": "Correzione: dipendenza admin aumentata a 7.6.20",
+				"es": "Corrección: dependencia de admin elevada a 7.6.20",
+				"pl": "Poprawka: zależność admin podniesiona do 7.6.20",
+				"uk": "Виправлення: залежність admin підвищено до 7.6.20",
+				"zh-cn": "修复:admin 依赖提升至 7.6.20"
+			},
 			"0.0.2": {
 				"en": "test release (npm publishing)",
 				"de": "Testrelease (npm-Veröffentlichung)",
@@ -93,7 +106,7 @@
 		],
 		"globalDependencies": [
 			{
-				"admin": ">=7.0.23"
+				"admin": ">=7.6.20"
 			}
 		],
 		"messagebox": true
