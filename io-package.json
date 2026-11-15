@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "nintendo-switch-parental",
-		"version": "0.0.1",
+		"version": "0.0.2",
 		"news": {
+			"0.0.2": {
+				"en": "test release (npm publishing)",
+				"de": "Testrelease (npm-Veröffentlichung)",
+				"ru": "Тестовый релиз (публикация в npm)",
+				"pt": "versão de teste (publicação no npm)",
+				"nl": "testrelease (npm-publicatie)",
+				"fr": "version de test (publication npm)",
+				"it": "versione di test (pubblicazione npm)",
+				"es": "versión de prueba (publicación en npm)",
+				"pl": "wersja testowa (publikacja w npm)",
+				"uk": "тестовий реліз (публікація в npm)",
+				"zh-cn": "测试版本(npm 发布)"
+			},
 			"0.0.1": {
 				"en": "initial release",
 				"de": "Erstveröffentlichung",
