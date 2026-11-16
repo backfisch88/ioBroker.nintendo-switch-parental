@@ -107,14 +107,14 @@ Every night shortly after midnight the adapter compares the rules at Nintendo wi
 ## Changelog
 
 ### **WORK IN PROGRESS**
+
+### 0.1.0 (2026-11-16)
 - (backfisch88) New: template (save, restore, nightly restore)
 - (backfisch88) New: pause today
 
 ### 0.0.3 (2026-11-15)
 - (backfisch88) Fix: admin dependency raised to 7.6.20
 
-### 0.0.2 (2026-11-15)
-- (backfisch88) test release (npm publishing)
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).
 

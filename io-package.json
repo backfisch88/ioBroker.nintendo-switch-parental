@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "nintendo-switch-parental",
-		"version": "0.0.3",
+		"version": "0.1.0",
 		"news": {
+			"0.1.0": {
+				"en": "New: template with nightly restore, pause today",
+				"de": "Neu: Vorlage mit nächtlichem Zurücksetzen, heute pausieren",
+				"ru": "Новое: шаблон с ночным восстановлением, пауза на сегодня",
+				"pt": "Novo: modelo com restauração noturna, pausar hoje",
+				"nl": "Nieuw: sjabloon met nachtelijk herstel, vandaag pauzeren",
+				"fr": "Nouveau : modèle avec restauration nocturne, pause pour aujourd’hui",
+				"it": "Novità: modello con ripristino notturno, pausa per oggi",
+				"es": "Nuevo: plantilla con restauración nocturna, pausar hoy",
+				"pl": "Nowość: szablon z nocnym przywracaniem, pauza na dziś",
+				"uk": "Нове: шаблон із нічним відновленням, пауза на сьогодні",
+				"zh-cn": "新增:模板及夜间恢复、今日暂停"
+			},
 			"0.0.3": {
 				"en": "Fix: admin dependency raised to 7.6.20",
 				"de": "Fix: Admin-Abhängigkeit auf 7.6.20 erhöht",

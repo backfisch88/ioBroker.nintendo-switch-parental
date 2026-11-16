@@ -1,6 +1,6 @@
 {
   "name": "iobroker.nintendo-switch-parental",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
   "author": {
     "name": "Henrik Schönhofen",
