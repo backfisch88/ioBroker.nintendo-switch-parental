@@ -30,6 +30,9 @@ class FakeAdapter extends EventEmitter {
 		}
 	}
 	async subscribeStatesAsync() {}
+	async getStateAsync(id) {
+		return this.states.has(id) ? { val: this.states.get(id), ack: true } : null;
+	}
 	async getForeignObjectAsync() {
 		return { common: { language: 'de' } };
 	}
@@ -261,7 +264,8 @@ describe('adapter with mocked cloud', () => {
 		const a = await start({}, cloud);
 		expect(a.states.get('info.connection')).to.equal(false);
 		expect(a.logs.some(l => l[0] === 'warn')).to.equal(true);
-		expect(a.timers).to.have.length(1);
+		// poll timer and nightly restore timer
+		expect(a.timers).to.have.length(2);
 		await a.onUnload(() => {});
 		expect(a.timers).to.have.length(0);
 	});
@@ -305,5 +309,127 @@ describe('adapter with mocked cloud', () => {
 		expect(a.sent[2].result).to.be.a('string');
 		expect(a.foreign).to.deep.equal([['system.adapter.nintendo-switch-parental.0', { native: { sessionToken: 'enc:NEWTOKEN', redirectUrl: '' } }]]);
 		await a.onUnload(() => {});
+	});
+
+	describe('template and pause', () => {
+		const write = async (a, key, val) => {
+			a.onStateChange(`nintendo-switch-parental.0.devices.D1.${key}`, { val, ack: false });
+			await idle();
+		};
+		const updates = cloud => cloud.calls.filter(c => c.path.endsWith('updatePlayTimer'));
+
+		it('creates the template states without overwriting them on the next poll', async () => {
+			const a = await start({}, createCloud());
+			expect(a.objects.get('devices.D1.saveTemplate').common).to.include({ role: 'button', read: false, write: true });
+			expect(a.objects.get('devices.D1.restoreTemplate').common).to.include({ role: 'button', read: false, write: true });
+			expect(a.objects.get('devices.D1.restoreDaily').common).to.include({ role: 'switch', write: true });
+			expect(a.objects.get('devices.D1.pausedLimit').common).to.include({ write: false });
+			expect(a.states.get('devices.D1.restoreDaily')).to.equal(false);
+			await write(a, 'restoreDaily', true);
+			await a.runExclusive(() => a.pollAll());
+			expect(a.states.get('devices.D1.restoreDaily')).to.equal(true);
+			await a.onUnload(() => {});
+		});
+
+		it('saves the rules as template and writes them back', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'saveTemplate', true);
+			const saved = JSON.parse(a.states.get('devices.D1.template'));
+			expect(saved.timerMode).to.equal('DAILY');
+			expect(saved.dailyRegulations.timeToPlayInOneDay.limitTime).to.equal(90);
+			expect(updates(cloud)).to.have.length(0);
+
+			await write(a, 'limit', 30);
+			expect(a.states.get('devices.D1.limit')).to.equal(30);
+			await write(a, 'restoreTemplate', true);
+			expect(a.states.get('devices.D1.limit')).to.equal(90);
+			expect(updates(cloud)).to.have.length(2);
+
+			// already identical: nothing is sent
+			await write(a, 'restoreTemplate', true);
+			expect(updates(cloud)).to.have.length(2);
+			await a.onUnload(() => {});
+		});
+
+		it('warns when no template is stored and ignores an invalid template', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'restoreTemplate', true);
+			expect(updates(cloud)).to.have.length(0);
+			expect(a.logs.some(l => l[0] === 'warn' && l[1].includes('No valid template'))).to.equal(true);
+
+			await write(a, 'saveTemplate', true);
+			const good = a.states.get('devices.D1.template');
+			await write(a, 'template', '{"nonsense":true}');
+			expect(a.states.get('devices.D1.template')).to.equal(good);
+			await a.onUnload(() => {});
+		});
+
+		it('restores the template at night only where it is switched on', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'saveTemplate', true);
+			await write(a, 'limit', 30);
+			await a.runDailyRestore(null, 1);
+			expect(a.states.get('devices.D1.limit')).to.equal(30);
+
+			await write(a, 'restoreDaily', true);
+			await a.runDailyRestore(null, 1);
+			expect(a.states.get('devices.D1.limit')).to.equal(90);
+			await a.onUnload(() => {});
+		});
+
+		it('schedules the nightly restore and clears it on unload', async () => {
+			const a = await start({}, createCloud());
+			expect(a.restoreTimer).to.not.equal(undefined);
+			await a.onUnload(() => {});
+			expect(a.restoreTimer).to.equal(undefined);
+		});
+
+		it('pauses today with limit 0 and resumes with the previous limit', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'pauseToday', true);
+			expect(a.states.get('devices.D1.limit')).to.equal(0);
+			expect(JSON.parse(a.states.get('devices.D1.pausedLimit')).setting).to.deep.equal({ enabled: true, limitTime: 90 });
+
+			// a second press must not overwrite the saved limit
+			await write(a, 'pauseToday', true);
+			expect(JSON.parse(a.states.get('devices.D1.pausedLimit')).setting.limitTime).to.equal(90);
+
+			await write(a, 'resumeToday', true);
+			expect(a.states.get('devices.D1.limit')).to.equal(90);
+			expect(a.states.get('devices.D1.pausedLimit')).to.equal('');
+			await a.onUnload(() => {});
+		});
+
+		it('ends an old pause at night but keeps one started today', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'pauseToday', true);
+			await a.runDailyRestore(null, 1);
+			expect(a.states.get('devices.D1.limit')).to.equal(0);
+
+			const pause = JSON.parse(a.states.get('devices.D1.pausedLimit'));
+			pause.date = '2000-01-01';
+			await a.setState('devices.D1.pausedLimit', { val: JSON.stringify(pause), ack: true });
+			await a.runDailyRestore(null, 1);
+			expect(a.states.get('devices.D1.limit')).to.equal(90);
+			expect(a.states.get('devices.D1.pausedLimit')).to.equal('');
+			await a.onUnload(() => {});
+		});
+
+		it('refuses to pause while extra time is active', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'addExtraTime', 15);
+			const before = updates(cloud).length;
+			await write(a, 'pauseToday', true);
+			expect(updates(cloud)).to.have.length(before);
+			expect(a.states.get('devices.D1.pausedLimit')).to.equal('');
+			expect(a.logs.some(l => l[0] === 'warn' && l[1].includes('extra play time'))).to.equal(true);
+			await a.onUnload(() => {});
+		});
 	});
 });

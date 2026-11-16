@@ -18,6 +18,9 @@ const DEFAULT_LANGUAGE = 'de-DE';
 const EXTRA_TIME_SYNC_ATTEMPTS = 3;
 const EXTRA_TIME_SYNC_DELAY_MS = 2000;
 const LOGIN_SESSION_MS = 15 * 60 * 1000;
+const RESTORE_JITTER_MS = 5 * 60 * 1000;
+const RESTORE_RETRY_MS = 15 * 60 * 1000;
+const RESTORE_ATTEMPTS = 3;
 
 /** @param {string} value - External identifier */
 const safeId = value => String(value).replace(/[^A-Za-z0-9_-]/g, '_');
@@ -137,6 +140,71 @@ const DEVICE_STATES = [
 		get: s => s.restrictionLevel,
 	},
 	{ id: 'alarmsEnabled', name: 'Alarms enabled', type: 'boolean', role: 'indicator', get: s => s.alarmsEnabled },
+	{
+		id: 'saveTemplate',
+		name: 'Save the current play time rules as template',
+		type: 'boolean',
+		role: 'button',
+		read: false,
+		write: true,
+		get: () => false,
+	},
+	{
+		id: 'pauseToday',
+		name: 'Pause today: set the play time limit to 0 until midnight',
+		type: 'boolean',
+		role: 'button',
+		read: false,
+		write: true,
+		get: () => false,
+	},
+	{
+		id: 'resumeToday',
+		name: 'End the pause and restore the previous limit',
+		type: 'boolean',
+		role: 'button',
+		read: false,
+		write: true,
+		get: () => false,
+	},
+	{
+		id: 'restoreTemplate',
+		name: 'Write the saved template back to the console',
+		type: 'boolean',
+		role: 'button',
+		read: false,
+		write: true,
+		get: () => false,
+	},
+];
+
+/** States that hold values set by the user or the adapter itself, so polling must not overwrite them. */
+const STORED_STATES = [
+	{
+		id: 'template',
+		name: 'Saved play time rules (template)',
+		type: 'string',
+		role: 'json',
+		write: true,
+		initial: '',
+	},
+	{
+		id: 'pausedLimit',
+		name: 'Limit before the pause (empty = not paused)',
+		type: 'string',
+		role: 'json',
+		write: false,
+		initial: '',
+	},
+	{
+		id: 'restoreDaily',
+		name: 'Restore the template every night shortly after midnight',
+		type: 'boolean',
+		role: 'switch',
+		write: true,
+		def: false,
+		initial: false,
+	},
 ];
 
 class NintendoSwitchParental extends utils.Adapter {
@@ -158,6 +226,7 @@ class NintendoSwitchParental extends utils.Adapter {
 		this.timezone = DEFAULT_TIMEZONE;
 		this.pollSeconds = DEFAULT_POLL_SECONDS;
 		this.pollTimer = undefined;
+		this.restoreTimer = undefined;
 		this.unloaded = false;
 		this.pollingStopped = false;
 		this.queue = Promise.resolve(undefined);
@@ -168,6 +237,8 @@ class NintendoSwitchParental extends utils.Adapter {
 		this.deviceMap = new Map();
 		/** "<safe device>.<safe app>" -> Nintendo application id */
 		this.appMap = new Map();
+		/** safe device id -> last valid template (JSON) */
+		this.templates = new Map();
 	}
 
 	async onReady() {
@@ -203,6 +274,7 @@ class NintendoSwitchParental extends utils.Adapter {
 		await this.subscribeStatesAsync('devices.*');
 		await this.runExclusive(() => this.pollAll());
 		this.scheduleNextPoll();
+		this.scheduleDailyRestore();
 	}
 
 	/**
@@ -240,6 +312,67 @@ class NintendoSwitchParental extends utils.Adapter {
 			await this.runExclusive(() => this.pollAll());
 			this.scheduleNextPoll();
 		}, this.pollSeconds * 1000);
+	}
+
+	/**
+	 * Schedule the nightly template restore for shortly after the next local midnight.
+	 * The random delay keeps many installations from calling Nintendo at the same second.
+	 */
+	scheduleDailyRestore() {
+		if (this.unloaded || this.pollingStopped) {
+			return;
+		}
+		const delay = L.msUntilMidnight(this.timezone) + 1000 + Math.floor(Math.random() * RESTORE_JITTER_MS);
+		this.restoreTimer = this.setTimeout(async () => {
+			this.restoreTimer = undefined;
+			// on days with a clock change the timer can fire an hour early, then just wait again
+			if (L.zonedNow(this.timezone).hour < 12) {
+				await this.runDailyRestore(null, 1);
+			}
+			this.scheduleDailyRestore();
+		}, delay);
+	}
+
+	/**
+	 * Restore the template on all consoles that have the nightly restore switched on.
+	 *
+	 * @param {string[] | null} only - Safe device IDs to retry, null for all
+	 * @param {number} attempt - Attempt number
+	 */
+	async runDailyRestore(only, attempt) {
+		const failed = [];
+		for (const [dev, deviceId] of this.deviceMap) {
+			if (this.unloaded || this.pollingStopped) {
+				return;
+			}
+			if (only && !only.includes(dev)) {
+				continue;
+			}
+			try {
+				const enabled = await this.getStateAsync(`devices.${dev}.restoreDaily`);
+				await this.runExclusive(async () => {
+					await this.resumePause(deviceId, dev, false);
+					if (enabled && enabled.val === true) {
+						await this.restoreTemplate(deviceId, dev);
+					}
+					await this.refreshDevice(deviceId);
+				});
+			} catch (err) {
+				failed.push(dev);
+				this.handleError(err, `Nightly restore of ${dev} failed`);
+			}
+		}
+		if (failed.length > 0 && attempt < RESTORE_ATTEMPTS && !this.unloaded && !this.pollingStopped) {
+			await new Promise(resolve => {
+				this.restoreTimer = this.setTimeout(() => {
+					this.restoreTimer = undefined;
+					resolve(undefined);
+				}, RESTORE_RETRY_MS);
+			});
+			if (!this.unloaded) {
+				await this.runDailyRestore(failed, attempt + 1);
+			}
+		}
 	}
 
 	/**
@@ -355,6 +488,158 @@ class NintendoSwitchParental extends utils.Adapter {
 	}
 
 	/**
+	 * Create a state whose value is owned by the user or the adapter and set it once if it has no value yet.
+	 *
+	 * @param {string} dev - Safe device ID
+	 * @param {string} id - State ID
+	 * @param {any} def - State definition
+	 */
+	async ensureStoredState(dev, id, def) {
+		await this.ensureObject(id, {
+			type: 'state',
+			common: {
+				name: def.name,
+				type: def.type,
+				role: def.role,
+				read: true,
+				write: def.write !== false,
+				...(def.def !== undefined ? { def: def.def } : {}),
+			},
+			native: {},
+		});
+		if (this.storedReady && this.storedReady.has(id)) {
+			return;
+		}
+		this.storedReady = this.storedReady || new Set();
+		const current = await this.getStateAsync(id);
+		if (!current || current.val === null || current.val === undefined) {
+			await this.setState(id, { val: def.initial, ack: true });
+		} else if (def.id === 'template' && this.parseTemplate(current.val)) {
+			this.templates.set(dev, String(current.val));
+		}
+		this.storedReady.add(id);
+	}
+
+	/**
+	 * @param {string} dev - Safe device ID
+	 * @returns {Promise<{date: string, weekday: number, setting: any} | null>} Stored pause, if any
+	 */
+	async readPause(dev) {
+		const state = await this.getStateAsync(`devices.${dev}.pausedLimit`);
+		if (!state || typeof state.val !== 'string' || !state.val) {
+			return null;
+		}
+		try {
+			const pause = JSON.parse(state.val);
+			return pause && typeof pause.date === 'string' && Number.isInteger(pause.weekday) && pause.setting
+				? pause
+				: null;
+		} catch {
+			return null;
+		}
+	}
+
+	/**
+	 * Block play for the rest of the day by setting today's limit to 0. The previous setting is kept
+	 * so that the pause ends at midnight or with resumeToday.
+	 *
+	 * @param {string} deviceId - Nintendo device ID
+	 * @param {string} dev - Safe device ID
+	 */
+	async pauseToday(deviceId, dev) {
+		const api = this.requireApi();
+		const now = L.zonedNow(this.timezone);
+		const res = await api.fetchParentalControlSetting(deviceId);
+		if (L.currentExtraTime(res, now)) {
+			throw new Error('Not possible while extra play time is active, cancel it first');
+		}
+		const regs = (res.parentalControlSetting || {}).playTimerRegulations;
+		if (!(await this.readPause(dev))) {
+			const backup = { date: now.date, weekday: now.weekday, setting: L.todayLimitSetting(regs, now) };
+			await this.setState(`devices.${dev}.pausedLimit`, { val: JSON.stringify(backup), ack: true });
+		}
+		try {
+			await api.updatePlayTimer(deviceId, L.withLimit(regs, now, 0));
+		} catch (err) {
+			if (!(await this.readPause(dev)) || (await this.readPause(dev))?.date === now.date) {
+				await this.setState(`devices.${dev}.pausedLimit`, { val: '', ack: true });
+			}
+			throw err;
+		}
+		this.log.info(`Play paused on ${dev} until midnight`);
+	}
+
+	/**
+	 * Restore the limit that was active before the pause.
+	 *
+	 * @param {string} deviceId - Nintendo device ID
+	 * @param {string} dev - Safe device ID
+	 * @param {boolean} force - End the pause even if it was started today
+	 * @returns {Promise<boolean>} True if a pause was ended
+	 */
+	async resumePause(deviceId, dev, force) {
+		const pause = await this.readPause(dev);
+		const now = L.zonedNow(this.timezone);
+		if (!pause || (!force && pause.date === now.date)) {
+			return false;
+		}
+		const api = this.requireApi();
+		const res = await api.fetchParentalControlSetting(deviceId);
+		if (L.currentExtraTime(res, now)) {
+			throw new Error('Not possible while extra play time is active, cancel it first');
+		}
+		const regs = (res.parentalControlSetting || {}).playTimerRegulations;
+		await api.updatePlayTimer(deviceId, L.withLimitSetting(regs, pause.weekday, pause.setting));
+		await this.setState(`devices.${dev}.pausedLimit`, { val: '', ack: true });
+		this.log.info(`Pause on ${dev} ended, previous limit restored`);
+		return true;
+	}
+
+	/**
+	 * Write the saved template back to the console if the console differs from it.
+	 *
+	 * @param {string} deviceId - Nintendo device ID
+	 * @param {string} dev - Safe device ID
+	 * @returns {Promise<boolean>} True if the console was changed
+	 */
+	async restoreTemplate(deviceId, dev) {
+		const state = await this.getStateAsync(`devices.${dev}.template`);
+		const template = this.parseTemplate(state && state.val);
+		if (!template) {
+			this.log.warn(`No valid template stored for ${dev}, press saveTemplate first`);
+			return false;
+		}
+		const api = this.requireApi();
+		const res = await api.fetchParentalControlSetting(deviceId);
+		if (L.currentExtraTime(res, L.zonedNow(this.timezone))) {
+			throw new Error('Not possible while extra play time is active, cancel it first');
+		}
+		if (L.sameTemplate((res.parentalControlSetting || {}).playTimerRegulations, template)) {
+			this.log.debug(`Play time rules of ${dev} already match the template`);
+			return false;
+		}
+		await api.updatePlayTimer(deviceId, template);
+		this.log.info(`Play time rules of ${dev} restored from the template`);
+		return true;
+	}
+
+	/**
+	 * @param {unknown} value - State value
+	 * @returns {any} The template, or null if the value is not a usable template
+	 */
+	parseTemplate(value) {
+		if (typeof value !== 'string' || !value) {
+			return null;
+		}
+		try {
+			const parsed = JSON.parse(value);
+			return L.isTemplate(parsed) ? parsed : null;
+		} catch {
+			return null;
+		}
+	}
+
+	/**
 	 * @param {any} snap - Snapshot from buildSnapshot
 	 */
 	async publishDevice(snap) {
@@ -364,6 +649,7 @@ class NintendoSwitchParental extends utils.Adapter {
 		await this.ensureStructure('devices', 'folder', 'Consoles');
 		await this.ensureStructure(base, 'device', snap.name || snap.id);
 		await Promise.all(DEVICE_STATES.map(def => this.publishState(`${base}.${def.id}`, def, def.get(snap))));
+		await Promise.all(STORED_STATES.map(def => this.ensureStoredState(dev, `${base}.${def.id}`, def)));
 
 		if (snap.players.length > 0) {
 			await this.ensureStructure(`${base}.players`, 'folder', 'Players');
@@ -536,6 +822,51 @@ class NintendoSwitchParental extends utils.Adapter {
 				await this.waitForExtraTime(deviceId, now);
 				return;
 			}
+			case 'saveTemplate': {
+				if (value) {
+					const { pcs } = await read();
+					const template = L.extractTemplate(pcs.playTimerRegulations);
+					if (!L.isTemplate(template)) {
+						throw new Error('The console returned no complete play time rules to save');
+					}
+					const json = JSON.stringify(template);
+					this.templates.set(safeDevice, json);
+					await this.setState(`devices.${safeDevice}.template`, { val: json, ack: true });
+					this.log.info(`Play time rules of ${safeDevice} saved as template`);
+				}
+				return;
+			}
+			case 'pauseToday':
+				if (value) {
+					await this.pauseToday(deviceId, safeDevice);
+				}
+				return;
+			case 'resumeToday':
+				if (value) {
+					await this.resumePause(deviceId, safeDevice, true);
+				}
+				return;
+			case 'restoreTemplate':
+				if (value) {
+					await this.restoreTemplate(deviceId, safeDevice);
+				}
+				return;
+			case 'restoreDaily':
+				await this.setState(`devices.${safeDevice}.restoreDaily`, { val: Boolean(value), ack: true });
+				return;
+			case 'template': {
+				if (this.parseTemplate(value)) {
+					this.templates.set(safeDevice, String(value));
+					await this.setState(`devices.${safeDevice}.template`, { val: String(value), ack: true });
+				} else {
+					this.log.warn(`Ignoring ${safeDevice}.template: not a complete set of play time rules`);
+					await this.setState(`devices.${safeDevice}.template`, {
+						val: this.templates.get(safeDevice) || '',
+						ack: true,
+					});
+				}
+				return;
+			}
 			case 'cancelExtraTime':
 				if (value) {
 					await api.updateExtraPlayingTime(deviceId, { cancel: true });
@@ -650,6 +981,10 @@ class NintendoSwitchParental extends utils.Adapter {
 			if (this.pollTimer) {
 				this.clearTimeout(this.pollTimer);
 				this.pollTimer = undefined;
+			}
+			if (this.restoreTimer) {
+				this.clearTimeout(this.restoreTimer);
+				this.restoreTimer = undefined;
 			}
 			await this.setState('info.connection', false, true);
 		} catch {

@@ -15,6 +15,8 @@ Unofficial [Nintendo Switch Parental Controls](https://www.nintendo.com/switch/p
 - Daily limit, timer mode (daily / per weekday) and suspend-software mode
 - Extra time: add or cancel
 - Bedtime start and end
+- Template: save the play time rules and write them back every night
+- Pause today: block play until midnight
 - Restriction level (age rating)
 - Play time per player and, optionally, per game (with allow list)
 - Polling every 1-60 minutes (default 5), commands are sent immediately
@@ -67,6 +69,13 @@ Per console under `devices.<deviceId>`:
 | `timerMode` | R/W | `DAILY` or `EACH_DAY_OF_THE_WEEK` |
 | `restrictionLevel` | R/W | `NONE`, `CHILDREN`, `YOUNG_TEENS`, `OLDER_TEENS` or `CUSTOM` |
 | `alarmsEnabled` | R | Whether alarms are shown on the console |
+| `saveTemplate` | W | Button, saves the current play time rules as template |
+| `restoreTemplate` | W | Button, writes the template back to the console |
+| `restoreDaily` | R/W | Switch, writes the template back every night shortly after midnight |
+| `template` | R/W | The saved template as JSON |
+| `pauseToday` | W | Button, sets today's limit to 0 until midnight |
+| `resumeToday` | W | Button, ends the pause and restores the previous limit |
+| `pausedLimit` | R | The limit from before the pause, empty when not paused |
 | `players.<playerId>.*` | R | Nickname, profile image and play time today per user |
 | `apps.<applicationId>.*` | R/W | Only with *Create states for each game*: title, play time today and `allowed` (allow list, ignores age restrictions) |
 
@@ -74,16 +83,32 @@ Instance: `info.connection` is `true` while Nintendo's cloud is reachable and th
 
 While extra time is active, the adapter refuses to change the limit, bedtime, suspend mode and timer mode, so cancel the extra time first. Invalid values are refused with a warning and the state returns to the real value right after.
 
+## Template and pause
+
+The template holds the whole schedule: timer mode, suspend mode, the limits of all days and the bedtime.
+
+1. Set the rules in the Nintendo app as they should normally be.
+2. Press `saveTemplate` once per console.
+3. Switch on `restoreDaily`.
+
+Every night shortly after midnight the adapter compares the rules at Nintendo with the template and writes the template back if they differ. One-off changes, for example a longer limit on a single day, therefore do not stay. `restoreTemplate` does the same on demand. The template can also be edited as JSON in `template`.
+
+`pauseToday` sets today's limit to 0, so the console cannot be used. The previous limit is kept in `pausedLimit`. `resumeToday` or midnight puts it back. In per-weekday mode the limit belongs to the weekday, so without the pause ending the 0 would stay for the following weeks.
+
 ## Notes
 
 - Settings changed here reach the console the next time it connects to the internet.
 - While extra time is active, the adapter refuses to change the limit, bedtime, suspend mode and timer mode. Cancel the extra time first.
 - Invalid values are refused with a warning and the state returns to the real value.
 - Changing the PIN is not supported.
+- The nightly restore runs up to five minutes after midnight and only while the adapter is running. A failed restore is retried twice every 15 minutes.
+- Pause and restore are refused while extra time is active.
 
 ## Changelog
 
 ### **WORK IN PROGRESS**
+- (backfisch88) New: template (save, restore, nightly restore)
+- (backfisch88) New: pause today
 
 ### 0.0.3 (2026-11-15)
 - (backfisch88) Fix: admin dependency raised to 7.6.20

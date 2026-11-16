@@ -50,7 +50,7 @@ const daily = {
 describe('logic', () => {
 	it('zonedNow returns civil time of the zone', () => {
 		const t = L.zonedNow('Europe/Berlin', new Date('2025-12-08T23:30:00Z'));
-		expect(t).to.deep.equal({ date: '2025-12-09', hour: 0, minute: 30, weekday: 1 });
+		expect(t).to.deep.equal({ date: '2025-12-09', hour: 0, minute: 30, second: 0, weekday: 1 });
 	});
 
 	it('validates timezones', () => {
@@ -197,5 +197,45 @@ describe('logic', () => {
 			expect(L.withAppAllowed(pcs, '0100aa', true).whitelistedApplicationList[0].safeLaunch).to.equal('ALLOW');
 			expect(() => L.withAppAllowed(pcs, 'NOPE', true)).to.throw();
 		});
+	});
+});
+
+describe('template helpers', () => {
+	const regs = {
+		timerMode: 'DAILY',
+		restrictionMode: 'ALARM',
+		dailyRegulations: { timeToPlayInOneDay: { enabled: true, limitTime: 60 } },
+		other: 1,
+	};
+
+	it('extracts only the schedule keys', () => {
+		expect(L.extractTemplate(regs)).to.have.all.keys('timerMode', 'restrictionMode', 'dailyRegulations');
+	});
+
+	it('validates templates', () => {
+		expect(L.isTemplate(L.extractTemplate(regs))).to.equal(true);
+		expect(L.isTemplate(null)).to.equal(false);
+		expect(L.isTemplate({ timerMode: 'X', restrictionMode: 'ALARM', dailyRegulations: {} })).to.equal(false);
+		expect(L.isTemplate({ timerMode: 'DAILY', restrictionMode: 'ALARM' })).to.equal(false);
+		expect(L.isTemplate({ timerMode: 'EACH_DAY_OF_THE_WEEK', restrictionMode: 'ALARM', dailyRegulations: {} })).to.equal(false);
+	});
+
+	it('compares templates independent of key order and extra keys', () => {
+		const other = { restrictionMode: 'ALARM', dailyRegulations: { timeToPlayInOneDay: { limitTime: 60, enabled: true } }, timerMode: 'DAILY' };
+		expect(L.sameTemplate(regs, other)).to.equal(true);
+		expect(L.sameTemplate(regs, { ...other, restrictionMode: 'FORCED_TERMINATION' })).to.equal(false);
+	});
+
+	it('computes the time until midnight', () => {
+		const ms = L.msUntilMidnight('Europe/Berlin', new Date('2026-11-16T22:30:00Z'));
+		expect(ms).to.equal(30 * 60 * 1000);
+	});
+
+	it('reads and writes the limit setting of a weekday', () => {
+		const setting = L.todayLimitSetting(regs, { weekday: 2 });
+		expect(setting).to.deep.equal({ enabled: true, limitTime: 60 });
+		const paused = L.withLimit(regs, { weekday: 2 }, 0);
+		const back = L.withLimitSetting(paused, 2, setting);
+		expect(back.dailyRegulations.timeToPlayInOneDay).to.deep.equal(setting);
 	});
 });
