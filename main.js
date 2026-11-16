@@ -18,6 +18,7 @@ const DEFAULT_LANGUAGE = 'de-DE';
 const EXTRA_TIME_SYNC_ATTEMPTS = 3;
 const EXTRA_TIME_SYNC_DELAY_MS = 2000;
 const LOGIN_SESSION_MS = 15 * 60 * 1000;
+const MAX_EXTRA_STEP = 60; // Nintendo accepts at most 60 minutes per request
 const RESTORE_JITTER_MS = 5 * 60 * 1000;
 const RESTORE_RETRY_MS = 15 * 60 * 1000;
 const RESTORE_ATTEMPTS = 3;
@@ -814,12 +815,33 @@ class NintendoSwitchParental extends utils.Adapter {
 				if (minutes === 0) {
 					return;
 				}
-				const response = await api.updateExtraPlayingTime(deviceId, { minutes });
-				// Nintendo asks for confirmation when the extra time would run into bedtime
-				if (response && response.nextStepDetail) {
-					await api.confirmExtraPlayingTime(deviceId, minutes, true);
+				// Nintendo accepts at most 60 minutes per request, so longer grants are sent in steps
+				const steps = [];
+				for (let left = minutes; left > 0; left -= MAX_EXTRA_STEP) {
+					steps.push(Math.min(left, MAX_EXTRA_STEP));
 				}
-				await this.waitForExtraTime(deviceId, now);
+				if (minutes === -1) {
+					steps.push(-1);
+				}
+				let added = 0;
+				for (const step of steps) {
+					try {
+						const response = await api.updateExtraPlayingTime(deviceId, { minutes: step });
+						// Nintendo asks for confirmation when the extra time would run into bedtime
+						if (response && response.nextStepDetail) {
+							await api.confirmExtraPlayingTime(deviceId, step, true);
+						}
+						await this.waitForExtraTime(deviceId, now);
+					} catch (err) {
+						if (added > 0) {
+							throw new Error(
+								`Only ${added} of ${minutes} minutes were added: ${err instanceof Error ? err.message : err}`,
+							);
+						}
+						throw err;
+					}
+					added += step;
+				}
 				return;
 			}
 			case 'saveTemplate': {

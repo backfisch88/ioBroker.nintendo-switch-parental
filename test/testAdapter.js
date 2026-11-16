@@ -119,7 +119,17 @@ function createCloud() {
 				cloud.regs = { ...cloud.regs, ...body.playTimerRegulations };
 				return json({});
 			case '/v2/actions/device/updateExtraPlayingTime':
-				cloud.extra = body.status === 'TO_CANCELED' ? null : { inOneDay: { duration: body.additionalTime, isInfinity: false } };
+				if (body.status === 'TO_ADDED' && body.additionalTime > 60) {
+					return json({ errors: [{ message: 'additionalTime must be less than or equal to 60' }] }, 400);
+				}
+				if (body.status === 'TO_CANCELED') {
+					cloud.extra = null;
+				} else if (body.status === 'TO_INFINITY') {
+					cloud.extra = { inOneDay: { duration: 0, isInfinity: true } };
+				} else {
+					const previous = (cloud.extra && cloud.extra.inOneDay && cloud.extra.inOneDay.duration) || 0;
+					cloud.extra = { inOneDay: { duration: previous + body.additionalTime, isInfinity: false } };
+				}
 				return json({ status: 'SUCCESS' });
 			case '/v2/actions/parentalControlSetting/updateRestrictionLevel':
 				return json({});
@@ -235,6 +245,18 @@ describe('adapter with mocked cloud', () => {
 		a.onStateChange('nintendo-switch-parental.0.devices.D1.cancelExtraTime', { val: true, ack: false });
 		await new Promise(resolve => setTimeout(resolve, 200));
 		expect(a.states.get('devices.D1.extraTime')).to.equal(0);
+		await a.onUnload(() => {});
+	});
+
+	it('sends extra time above 60 minutes in steps', async () => {
+		const cloud = createCloud();
+		const a = await start({}, cloud);
+		a.onStateChange('nintendo-switch-parental.0.devices.D1.addExtraTime', { val: 140, ack: false });
+		await new Promise(resolve => setTimeout(resolve, 1500));
+		const sent = cloud.calls.filter(c => c.path.endsWith('updateExtraPlayingTime')).map(c => c.body.additionalTime);
+		expect(sent).to.deep.equal([60, 60, 20]);
+		expect(a.states.get('devices.D1.extraTime')).to.equal(140);
+		expect(a.logs.some(l => l[0] === 'warn')).to.equal(false);
 		await a.onUnload(() => {});
 	});
 

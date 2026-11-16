@@ -61,7 +61,7 @@ Per console under `devices.<deviceId>`:
 | `playTimeMonth` | R | Minutes played this month |
 | `limit` | R/W | Daily limit in minutes, `-1` = no limit, maximum 360. Applies to today's regulation (the weekday in per-weekday mode) |
 | `extraTime` | R | Extra time granted today in minutes, `-1` = unlimited |
-| `addExtraTime` | W | Minutes of extra time to add today, `-1` = unlimited |
+| `addExtraTime` | W | Minutes of extra time to add today, `-1` = unlimited. Nintendo takes 60 minutes per request, so more is sent in steps |
 | `cancelExtraTime` | W | Button, removes today's extra time |
 | `bedtimeAlarm` | R/W | Bedtime start `HH:MM` (16:00-23:59), `00:00` = bedtime off |
 | `bedtimeEnd` | R/W | Bedtime end `HH:MM` (05:00-09:00), `00:00` = bedtime off |
@@ -108,12 +108,12 @@ Every night shortly after midnight the adapter compares the rules at Nintendo wi
 
 ### **WORK IN PROGRESS**
 
+### 0.1.1 (2026-11-16)
+- (backfisch88) Fix: extra time above 60 minutes is sent in steps
+
 ### 0.1.0 (2026-11-16)
 - (backfisch88) New: template (save, restore, nightly restore)
 - (backfisch88) New: pause today
-
-### 0.0.3 (2026-11-15)
-- (backfisch88) Fix: admin dependency raised to 7.6.20
 
 
 Older changes can be found in [CHANGELOG_OLD.md](CHANGELOG_OLD.md).

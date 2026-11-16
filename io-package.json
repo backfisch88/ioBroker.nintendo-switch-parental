@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "nintendo-switch-parental",
-		"version": "0.1.0",
+		"version": "0.1.1",
 		"news": {
+			"0.1.1": {
+				"en": "Fix: extra time above 60 minutes is sent in steps",
+				"de": "Fix: Zusatzzeit über 60 Minuten wird in Schritten gesendet",
+				"ru": "Исправление: дополнительное время более 60 минут отправляется по частям",
+				"pt": "Correção: tempo extra acima de 60 minutos é enviado em etapas",
+				"nl": "Fix: extra tijd boven 60 minuten wordt in stappen verzonden",
+				"fr": "Correction : le temps supplémentaire de plus de 60 minutes est envoyé par étapes",
+				"it": "Correzione: il tempo extra oltre 60 minuti viene inviato a passi",
+				"es": "Corrección: el tiempo extra superior a 60 minutos se envía por pasos",
+				"pl": "Poprawka: dodatkowy czas powyżej 60 minut jest wysyłany etapami",
+				"uk": "Виправлення: додатковий час понад 60 хвилин надсилається частинами",
+				"zh-cn": "修复:超过 60 分钟的额外时间分步发送"
+			},
 			"0.1.0": {
 				"en": "New: template with nightly restore, pause today",
 				"de": "Neu: Vorlage mit nächtlichem Zurücksetzen, heute pausieren",
