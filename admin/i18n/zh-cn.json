@@ -12,5 +12,7 @@
 	"Language tag": "语言标签",
 	"e.g. de-DE": "例如 de-DE",
 	"Create states for each game (allow list, play time)": "为每个游戏创建状态（允许列表、游戏时间）",
-	"Login link (alternative: copy and open in a browser)": "登录链接（备选：复制并在浏览器中打开）"
+	"Login link (alternative: copy and open in a browser)": "登录链接（备选：复制并在浏览器中打开）",
+	"loginHint": "登录后右键点击“Select this person”，复制链接并粘贴到下方",
+	"loginDone": "登录成功，实例将重新启动"
 }

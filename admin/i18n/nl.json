@@ -12,5 +12,7 @@
 	"Language tag": "Taalcode",
 	"e.g. de-DE": "bijv. de-DE",
 	"Create states for each game (allow list, play time)": "Statussen per spel aanmaken (toegestane lijst, speeltijd)",
-	"Login link (alternative: copy and open in a browser)": "Inloglink (alternatief: kopiëren en in de browser openen)"
+	"Login link (alternative: copy and open in a browser)": "Inloglink (alternatief: kopiëren en in de browser openen)",
+	"loginHint": "Log in, klik met de rechtermuisknop op \"Select this person\", kopieer de link en plak hem hieronder",
+	"loginDone": "Inloggen gelukt, de instantie wordt opnieuw gestart"
 }

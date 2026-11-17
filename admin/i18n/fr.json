@@ -12,5 +12,7 @@
 	"Language tag": "Balise de langue",
 	"e.g. de-DE": "p. ex. de-DE",
 	"Create states for each game (allow list, play time)": "Créer des états pour chaque jeu (liste autorisée, temps de jeu)",
-	"Login link (alternative: copy and open in a browser)": "Lien de connexion (alternative : copier et ouvrir dans le navigateur)"
+	"Login link (alternative: copy and open in a browser)": "Lien de connexion (alternative : copier et ouvrir dans le navigateur)",
+	"loginHint": "Connectez-vous, faites un clic droit sur « Select this person », copiez le lien et collez-le ci-dessous",
+	"loginDone": "Connexion réussie, l'instance redémarre"
 }

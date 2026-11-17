@@ -12,5 +12,7 @@
 	"Language tag": "Языковой тег",
 	"e.g. de-DE": "напр. de-DE",
 	"Create states for each game (allow list, play time)": "Создавать состояния для каждой игры (список разрешённых, время игры)",
-	"Login link (alternative: copy and open in a browser)": "Ссылка для входа (альтернатива: скопировать и открыть в браузере)"
+	"Login link (alternative: copy and open in a browser)": "Ссылка для входа (альтернатива: скопировать и открыть в браузере)",
+	"loginHint": "Войдите, щёлкните правой кнопкой по «Select this person», скопируйте ссылку и вставьте её ниже",
+	"loginDone": "Вход выполнен, экземпляр перезапускается"
 }

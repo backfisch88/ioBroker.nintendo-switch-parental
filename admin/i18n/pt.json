@@ -12,5 +12,7 @@
 	"Language tag": "Etiqueta de idioma",
 	"e.g. de-DE": "p. ex. de-DE",
 	"Create states for each game (allow list, play time)": "Criar estados para cada jogo (lista de permissões, tempo de jogo)",
-	"Login link (alternative: copy and open in a browser)": "Link de início de sessão (alternativa: copiar e abrir no navegador)"
+	"Login link (alternative: copy and open in a browser)": "Link de início de sessão (alternativa: copiar e abrir no navegador)",
+	"loginHint": "Inicie sessão, clique com o botão direito em \"Select this person\", copie o link e cole-o abaixo",
+	"loginDone": "Início de sessão concluído, a instância será reiniciada"
 }

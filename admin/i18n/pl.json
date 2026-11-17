@@ -12,5 +12,7 @@
 	"Language tag": "Znacznik języka",
 	"e.g. de-DE": "np. de-DE",
 	"Create states for each game (allow list, play time)": "Twórz stany dla każdej gry (lista dozwolonych, czas gry)",
-	"Login link (alternative: copy and open in a browser)": "Link logowania (alternatywa: skopiuj i otwórz w przeglądarce)"
+	"Login link (alternative: copy and open in a browser)": "Link logowania (alternatywa: skopiuj i otwórz w przeglądarce)",
+	"loginHint": "Zaloguj się, kliknij prawym przyciskiem „Select this person”, skopiuj link i wklej go poniżej",
+	"loginDone": "Logowanie udane, instancja zostanie uruchomiona ponownie"
 }

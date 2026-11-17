@@ -12,5 +12,7 @@
 	"Language tag": "Sprachkürzel",
 	"e.g. de-DE": "z. B. de-DE",
 	"Create states for each game (allow list, play time)": "Datenpunkte pro Spiel anlegen (Freigabeliste, Spielzeit)",
-	"Login link (alternative: copy and open in a browser)": "Login-Link (Alternative: kopieren und im Browser öffnen)"
+	"Login link (alternative: copy and open in a browser)": "Login-Link (Alternative: kopieren und im Browser öffnen)",
+	"loginHint": "Anmelden, dann Rechtsklick auf \"Diese Person auswählen\", Link kopieren und unten einfügen",
+	"loginDone": "Anmeldung erfolgreich, die Instanz wird neu gestartet"
 }

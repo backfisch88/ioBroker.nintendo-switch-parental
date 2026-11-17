@@ -101,13 +101,18 @@ Every night shortly after midnight the adapter compares the rules at Nintendo wi
 - While extra time is active, the adapter refuses to change the limit, bedtime, suspend mode and timer mode. Cancel the extra time first.
 - Invalid values are refused with a warning and the state returns to the real value.
 - Changing the PIN is not supported.
-- The nightly restore runs up to five minutes after midnight and only while the adapter is running. A failed restore is retried twice every 15 minutes.
+- The nightly restore runs up to five minutes after midnight. A failed restore is retried twice every 15 minutes. If the adapter was not running at midnight, old pauses end and the template is restored at the next start (`info.lastNightlyRun` holds the day of the last run).
 - Pause and restore are refused while extra time is active.
 
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 0.1.2 (2026-11-17)
 - (backfisch88) Fix: size attributes for all admin settings
+- (backfisch88) Fix: a missed midnight (pause end, template restore) is caught up at the next start
+- (backfisch88) Fix: nightly run loads the console list itself if the first poll failed
+- (backfisch88) Fix: extra time 0 is ignored, `addExtraTime` has a maximum of 360
+- (backfisch88) Change: existing states get updated definitions, admin messages use all translations
+- (backfisch88) Change: translated adapter description, same contact address everywhere
 
 ### 0.1.1 (2026-11-16)
 - (backfisch88) Fix: extra time above 60 minutes is sent in steps

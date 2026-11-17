@@ -22,6 +22,7 @@ const MAX_EXTRA_STEP = 60; // Nintendo accepts at most 60 minutes per request
 const RESTORE_JITTER_MS = 5 * 60 * 1000;
 const RESTORE_RETRY_MS = 15 * 60 * 1000;
 const RESTORE_ATTEMPTS = 3;
+const UI_LANGUAGES = ['en', 'de', 'ru', 'pt', 'nl', 'fr', 'it', 'es', 'pl', 'uk', 'zh-cn'];
 
 /** @param {string} value - External identifier */
 const safeId = value => String(value).replace(/[^A-Za-z0-9_-]/g, '_');
@@ -84,6 +85,7 @@ const DEVICE_STATES = [
 		role: 'value',
 		unit: 'min',
 		min: -1,
+		max: 360,
 		def: 0,
 		read: false,
 		write: true,
@@ -228,6 +230,10 @@ class NintendoSwitchParental extends utils.Adapter {
 		this.pollSeconds = DEFAULT_POLL_SECONDS;
 		this.pollTimer = undefined;
 		this.restoreTimer = undefined;
+		this.retryTimer = undefined;
+		this.retryResolve = undefined;
+		this.deviceListLoaded = false;
+		this.storedReady = new Set();
 		this.unloaded = false;
 		this.pollingStopped = false;
 		this.queue = Promise.resolve(undefined);
@@ -276,6 +282,8 @@ class NintendoSwitchParental extends utils.Adapter {
 		await this.runExclusive(() => this.pollAll());
 		this.scheduleNextPoll();
 		this.scheduleDailyRestore();
+		// not awaited: a retry after a failed catch-up can take a while
+		this.catchUpNightly().catch(() => undefined);
 	}
 
 	/**
@@ -335,13 +343,58 @@ class NintendoSwitchParental extends utils.Adapter {
 	}
 
 	/**
+	 * Make up for a midnight that passed while the adapter was not running: end old pauses and,
+	 * if the nightly run was missed, restore the templates.
+	 */
+	async catchUpNightly() {
+		if (this.unloaded || this.pollingStopped) {
+			return;
+		}
+		try {
+			await this.ensureObject('info.lastNightlyRun', {
+				type: 'state',
+				common: {
+					name: 'Date of the last nightly run',
+					type: 'string',
+					role: 'text',
+					read: true,
+					write: false,
+					def: '',
+				},
+				native: {},
+			});
+			const today = L.zonedNow(this.timezone).date;
+			const last = await this.getStateAsync('info.lastNightlyRun');
+			const lastDate = last && typeof last.val === 'string' ? last.val : '';
+			if (lastDate && lastDate < today) {
+				this.log.info(`Nightly run of ${lastDate} was missed, catching up`);
+				await this.runDailyRestore(null, 1);
+			} else {
+				// old pauses must end even when there is nothing else to catch up
+				await this.runDailyRestore(null, RESTORE_ATTEMPTS, true);
+				if (!lastDate) {
+					await this.setState('info.lastNightlyRun', { val: today, ack: true });
+				}
+			}
+		} catch (err) {
+			this.log.warn(`Catching up the nightly run failed: ${err instanceof Error ? err.message : err}`);
+		}
+	}
+
+	/**
 	 * Restore the template on all consoles that have the nightly restore switched on.
+	 * Without a known console list (the first poll failed) the list is loaded first.
 	 *
 	 * @param {string[] | null} only - Safe device IDs to retry, null for all
 	 * @param {number} attempt - Attempt number
+	 * @param {boolean} [pausesOnly] - Only end old pauses, leave the template alone
 	 */
-	async runDailyRestore(only, attempt) {
+	async runDailyRestore(only, attempt, pausesOnly = false) {
+		if (!this.deviceListLoaded && !this.unloaded) {
+			await this.runExclusive(() => this.pollAll());
+		}
 		const failed = [];
+		const retryAll = !this.deviceListLoaded;
 		for (const [dev, deviceId] of this.deviceMap) {
 			if (this.unloaded || this.pollingStopped) {
 				return;
@@ -353,7 +406,7 @@ class NintendoSwitchParental extends utils.Adapter {
 				const enabled = await this.getStateAsync(`devices.${dev}.restoreDaily`);
 				await this.runExclusive(async () => {
 					await this.resumePause(deviceId, dev, false);
-					if (enabled && enabled.val === true) {
+					if (!pausesOnly && enabled && enabled.val === true) {
 						await this.restoreTemplate(deviceId, dev);
 					}
 					await this.refreshDevice(deviceId);
@@ -363,16 +416,22 @@ class NintendoSwitchParental extends utils.Adapter {
 				this.handleError(err, `Nightly restore of ${dev} failed`);
 			}
 		}
-		if (failed.length > 0 && attempt < RESTORE_ATTEMPTS && !this.unloaded && !this.pollingStopped) {
+		if ((failed.length > 0 || retryAll) && attempt < RESTORE_ATTEMPTS && !this.unloaded && !this.pollingStopped) {
 			await new Promise(resolve => {
-				this.restoreTimer = this.setTimeout(() => {
-					this.restoreTimer = undefined;
+				this.retryResolve = resolve;
+				this.retryTimer = this.setTimeout(() => {
+					this.retryTimer = undefined;
+					this.retryResolve = undefined;
 					resolve(undefined);
 				}, RESTORE_RETRY_MS);
 			});
 			if (!this.unloaded) {
-				await this.runDailyRestore(failed, attempt + 1);
+				await this.runDailyRestore(retryAll ? null : failed, attempt + 1, pausesOnly);
 			}
+			return;
+		}
+		if (!pausesOnly && !this.unloaded && !this.pollingStopped) {
+			await this.setState('info.lastNightlyRun', { val: L.zonedNow(this.timezone).date, ack: true });
 		}
 	}
 
@@ -388,7 +447,7 @@ class NintendoSwitchParental extends utils.Adapter {
 		} else {
 			this.log.warn(`${context}: ${message}`);
 		}
-		this.setState('info.connection', false, true);
+		this.setState('info.connection', false, true).catch(() => undefined);
 	}
 
 	async pollAll() {
@@ -397,6 +456,7 @@ class NintendoSwitchParental extends utils.Adapter {
 		}
 		try {
 			const owned = await this.requireApi().fetchOwnedDevices();
+			this.deviceListLoaded = true;
 			const list = Array.isArray(owned.ownedDevices) ? owned.ownedDevices : [];
 			let failed = 0;
 			for (const entry of list) {
@@ -451,6 +511,11 @@ class NintendoSwitchParental extends utils.Adapter {
 			return;
 		}
 		await this.setObjectNotExistsAsync(id, obj);
+		if (obj.type === 'state') {
+			// bring older installations up to date, a name changed by the user stays untouched
+			const common = Object.fromEntries(Object.entries(obj.common || {}).filter(([key]) => key !== 'name'));
+			await this.extendObjectAsync(id, { common });
+		}
 		this.knownObjects.add(id);
 	}
 
@@ -508,10 +573,9 @@ class NintendoSwitchParental extends utils.Adapter {
 			},
 			native: {},
 		});
-		if (this.storedReady && this.storedReady.has(id)) {
+		if (this.storedReady.has(id)) {
 			return;
 		}
-		this.storedReady = this.storedReady || new Set();
 		const current = await this.getStateAsync(id);
 		if (!current || current.val === null || current.val === undefined) {
 			await this.setState(id, { val: def.initial, ack: true });
@@ -809,11 +873,11 @@ class NintendoSwitchParental extends utils.Adapter {
 			}
 			case 'addExtraTime': {
 				const minutes = Number(value);
-				if (!Number.isInteger(minutes) || (minutes !== -1 && (minutes < 1 || minutes > 360))) {
-					throw new Error('Extra time must be -1 (unlimited) or 1-360 minutes');
-				}
 				if (minutes === 0) {
 					return;
+				}
+				if (!Number.isInteger(minutes) || (minutes !== -1 && (minutes < 1 || minutes > 360))) {
+					throw new Error('Extra time must be -1 (unlimited) or 1-360 minutes');
 				}
 				// Nintendo accepts at most 60 minutes per request, so longer grants are sent in steps
 				const steps = [];
@@ -931,19 +995,30 @@ class NintendoSwitchParental extends utils.Adapter {
 	}
 
 	/**
-	 * Text for the admin UI in the system language (German or English).
+	 * Text for the admin UI in the system language, taken from admin/i18n (English as fallback).
 	 *
-	 * @param {string} en - English text
-	 * @param {string} de - German text
+	 * @param {string} key - Translation key
 	 * @returns {Promise<string>} Text
 	 */
-	async uiText(en, de) {
+	async uiText(key) {
+		let language = 'en';
 		try {
 			const config = await this.getForeignObjectAsync('system.config');
-			return config && config.common && config.common.language === 'de' ? de : en;
+			const configured = config && config.common && config.common.language;
+			if (typeof configured === 'string' && UI_LANGUAGES.includes(configured)) {
+				language = configured;
+			}
 		} catch {
-			return en;
+			// keep English
 		}
+		const load = lang => {
+			try {
+				return require(`./admin/i18n/${lang}.json`);
+			} catch {
+				return {};
+			}
+		};
+		return load(language)[key] || load('en')[key] || key;
 	}
 
 	/**
@@ -966,10 +1041,7 @@ class NintendoSwitchParental extends utils.Adapter {
 				reply({
 					openUrl: session.loginUrl,
 					window: '_blank',
-					result: `${await this.uiText(
-						'Sign in, then right-click "Select this person", copy the link and paste it below',
-						'Anmelden, dann Rechtsklick auf "Diese Person auswählen", Link kopieren und unten einfügen',
-					)}\n${session.loginUrl}`,
+					result: `${await this.uiText('loginHint')}\n${session.loginUrl}`,
 				});
 			} else if (obj.command === 'completeLogin') {
 				const link = obj.message && obj.message.redirectUrl;
@@ -982,10 +1054,7 @@ class NintendoSwitchParental extends utils.Adapter {
 					native: { sessionToken: this.encrypt(token), redirectUrl: '' },
 				});
 				reply({
-					result: await this.uiText(
-						'Login successful, the instance restarts',
-						'Anmeldung erfolgreich, die Instanz wird neu gestartet',
-					),
+					result: await this.uiText('loginDone'),
 					reloadBrowser: true,
 				});
 			}
@@ -1007,6 +1076,14 @@ class NintendoSwitchParental extends utils.Adapter {
 			if (this.restoreTimer) {
 				this.clearTimeout(this.restoreTimer);
 				this.restoreTimer = undefined;
+			}
+			if (this.retryTimer) {
+				this.clearTimeout(this.retryTimer);
+				this.retryTimer = undefined;
+			}
+			if (this.retryResolve) {
+				this.retryResolve(undefined);
+				this.retryResolve = undefined;
 			}
 			await this.setState('info.connection', false, true);
 		} catch {

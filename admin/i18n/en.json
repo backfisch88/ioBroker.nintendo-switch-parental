@@ -12,5 +12,7 @@
 	"Language tag": "Language tag",
 	"e.g. de-DE": "e.g. de-DE",
 	"Create states for each game (allow list, play time)": "Create states for each game (allow list, play time)",
-	"Login link (alternative: copy and open in a browser)": "Login link (alternative: copy and open in a browser)"
+	"Login link (alternative: copy and open in a browser)": "Login link (alternative: copy and open in a browser)",
+	"loginHint": "Sign in, then right-click \"Select this person\", copy the link and paste it below",
+	"loginDone": "Login successful, the instance restarts"
 }

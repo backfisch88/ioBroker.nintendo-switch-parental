@@ -1,10 +1,10 @@
 {
   "name": "iobroker.nintendo-switch-parental",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
   "author": {
     "name": "Henrik Schönhofen",
-    "email": "henrik.schoenhofen@gmx.de"
+    "email": "henrik.schoenhofen@icloud.com"
   },
   "contributors": [],
   "homepage": "https://github.com/backfisch88/ioBroker.nintendo-switch-parental",
@@ -46,7 +46,6 @@
     "admin{,/!(src)/**}/!(tsconfig|tsconfig.*|.eslintrc).{json,json5}",
     "admin{,/!(src)/**}/*.{html,css,png,svg,jpg,js}",
     "lib/",
-    "www/",
     "io-package.json",
     "LICENSE",
     "main.js"

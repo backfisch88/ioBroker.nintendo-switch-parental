@@ -12,5 +12,7 @@
 	"Language tag": "Tag lingua",
 	"e.g. de-DE": "ad es. de-DE",
 	"Create states for each game (allow list, play time)": "Crea stati per ogni gioco (elenco consentiti, tempo di gioco)",
-	"Login link (alternative: copy and open in a browser)": "Link di accesso (alternativa: copiare e aprire nel browser)"
+	"Login link (alternative: copy and open in a browser)": "Link di accesso (alternativa: copiare e aprire nel browser)",
+	"loginHint": "Accedi, fai clic con il tasto destro su \"Select this person\", copia il link e incollalo qui sotto",
+	"loginDone": "Accesso riuscito, l'istanza viene riavviata"
 }

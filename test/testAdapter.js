@@ -29,6 +29,10 @@ class FakeAdapter extends EventEmitter {
 			this.objects.set(id, obj);
 		}
 	}
+	async extendObjectAsync(id, obj) {
+		const current = this.objects.get(id) || {};
+		this.objects.set(id, { ...current, ...obj, common: { ...current.common, ...obj.common } });
+	}
 	async subscribeStatesAsync() {}
 	async getStateAsync(id) {
 		return this.states.has(id) ? { val: this.states.get(id), ack: true } : null;
@@ -209,6 +213,7 @@ describe('adapter with mocked cloud', () => {
 	it('ignores acknowledged values and unrelated ids', async () => {
 		const cloud = createCloud();
 		const a = await start({}, cloud);
+		await idle(); // let the start-up catch-up finish
 		const before = cloud.calls.length;
 		a.onStateChange('nintendo-switch-parental.0.devices.D1.limit', { val: 10, ack: true });
 		a.onStateChange('nintendo-switch-parental.0.info.connection', { val: false, ack: false });
@@ -260,6 +265,29 @@ describe('adapter with mocked cloud', () => {
 		await a.onUnload(() => {});
 	});
 
+	it('ignores extra time 0 without a warning', async () => {
+		const cloud = createCloud();
+		const a = await start({}, cloud);
+		a.onStateChange('nintendo-switch-parental.0.devices.D1.addExtraTime', { val: 0, ack: false });
+		await idle();
+		expect(cloud.calls.some(c => c.path.endsWith('updateExtraPlayingTime'))).to.equal(false);
+		expect(a.logs.some(l => l[0] === 'warn')).to.equal(false);
+		expect(a.objects.get('devices.D1.addExtraTime').common.max).to.equal(360);
+		await a.onUnload(() => {});
+	});
+
+	it('updates the definition of existing states but keeps a renamed object name', async () => {
+		const a = await start({}, createCloud());
+		const limit = a.objects.get('devices.D1.limit');
+		limit.common.max = 1;
+		limit.common.name = 'My name';
+		a.knownObjects.clear();
+		await a.refreshDevice('D1');
+		expect(a.objects.get('devices.D1.limit').common.max).to.equal(360);
+		expect(a.objects.get('devices.D1.limit').common.name).to.equal('My name');
+		await a.onUnload(() => {});
+	});
+
 	it('toggles the allow list of a game', async () => {
 		const cloud = createCloud();
 		const a = await start({}, cloud);
@@ -307,6 +335,16 @@ describe('adapter with mocked cloud', () => {
 		const a = await start({ sessionToken: '' }, cloud);
 		expect(cloud.calls).to.have.length(0);
 		expect(a.logs.some(l => l[0] === 'warn')).to.equal(true);
+		await a.onUnload(() => {});
+	});
+
+	it('answers the admin UI in the system language with an English fallback', async () => {
+		const a = await start({}, createCloud());
+		expect(await a.uiText('loginDone')).to.contain('Anmeldung');
+		a.getForeignObjectAsync = async () => ({ common: { language: 'fr' } });
+		expect(await a.uiText('loginDone')).to.contain('Connexion');
+		a.getForeignObjectAsync = async () => ({ common: { language: '../x' } });
+		expect(await a.uiText('loginDone')).to.equal('Login successful, the instance restarts');
 		await a.onUnload(() => {});
 	});
 
@@ -440,6 +478,80 @@ describe('adapter with mocked cloud', () => {
 			expect(a.states.get('devices.D1.limit')).to.equal(90);
 			expect(a.states.get('devices.D1.pausedLimit')).to.equal('');
 			await a.onUnload(() => {});
+		});
+
+		it('remembers the day of the last nightly run and writes it after a run', async () => {
+			const a = await start({}, createCloud());
+			await idle();
+			const today = L.zonedNow('Europe/Berlin').date;
+			expect(a.states.get('info.lastNightlyRun')).to.equal(today);
+			await a.setState('info.lastNightlyRun', { val: '2000-01-01', ack: true });
+			await a.runDailyRestore(null, 1);
+			expect(a.states.get('info.lastNightlyRun')).to.equal(today);
+			await a.onUnload(() => {});
+		});
+
+		it('catches up a missed night after a restart', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'saveTemplate', true);
+			await write(a, 'restoreDaily', true);
+			await write(a, 'limit', 30);
+
+			// same day: nothing to catch up, the change of the day stays
+			await a.catchUpNightly();
+			expect(a.states.get('devices.D1.limit')).to.equal(30);
+
+			await a.setState('info.lastNightlyRun', { val: '2000-01-01', ack: true });
+			await a.catchUpNightly();
+			expect(a.states.get('devices.D1.limit')).to.equal(90);
+			expect(a.states.get('info.lastNightlyRun')).to.equal(L.zonedNow('Europe/Berlin').date);
+			await a.onUnload(() => {});
+		});
+
+		it('ends an old pause at start even without a nightly run to catch up', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'pauseToday', true);
+			await write(a, 'saveTemplate', true);
+			await write(a, 'restoreDaily', true);
+
+			// a pause from today stays, and the template is not touched at a normal start
+			await a.catchUpNightly();
+			expect(a.states.get('devices.D1.limit')).to.equal(0);
+
+			const pause = JSON.parse(a.states.get('devices.D1.pausedLimit'));
+			pause.date = '2000-01-01';
+			await a.setState('devices.D1.pausedLimit', { val: JSON.stringify(pause), ack: true });
+			await a.catchUpNightly();
+			expect(a.states.get('devices.D1.limit')).to.equal(90);
+			expect(a.states.get('devices.D1.pausedLimit')).to.equal('');
+			await a.onUnload(() => {});
+		});
+
+		it('loads the console list at night when the first poll failed', async () => {
+			const cloud = createCloud();
+			cloud.fail = 503;
+			const a = await start({}, cloud);
+			expect(a.deviceMap.size).to.equal(0);
+			cloud.fail = null;
+			await a.runDailyRestore(null, 1);
+			expect(a.deviceListLoaded).to.equal(true);
+			expect(a.deviceMap.size).to.equal(1);
+			expect(a.states.get('info.lastNightlyRun')).to.equal(L.zonedNow('Europe/Berlin').date);
+			await a.onUnload(() => {});
+		});
+
+		it('retries later while the console list is unknown and stops on unload', async () => {
+			const cloud = createCloud();
+			cloud.fail = 503;
+			const a = await start({}, cloud);
+			const run = a.runDailyRestore(null, 1);
+			await idle();
+			expect(a.retryTimer).to.not.equal(undefined);
+			await a.onUnload(() => {});
+			await run;
+			expect(a.retryTimer).to.equal(undefined);
 		});
 
 		it('refuses to pause while extra time is active', async () => {

@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "nintendo-switch-parental",
-		"version": "0.1.1",
+		"version": "0.1.2",
 		"news": {
+			"0.1.2": {
+				"en": "Fix: missed midnight (pause end, template restore) is caught up at start; admin size attributes, translations",
+				"de": "Fix: verpasste Mitternacht (Pausenende, Template) wird beim Start nachgeholt; Admin-Größenangaben, Übersetzungen",
+				"ru": "Исправление: пропущенная полночь (конец паузы, шаблон) выполняется при запуске; размеры в админке, переводы",
+				"pt": "Correção: meia-noite perdida (fim da pausa, modelo) é recuperada ao iniciar; tamanhos no admin, traduções",
+				"nl": "Fix: gemiste middernacht (einde pauze, sjabloon) wordt bij start ingehaald; admin-afmetingen, vertalingen",
+				"fr": "Correction : minuit manqué (fin de pause, modèle) rattrapé au démarrage ; tailles admin, traductions",
+				"it": "Correzione: mezzanotte persa (fine pausa, modello) recuperata all’avvio; dimensioni admin, traduzioni",
+				"es": "Corrección: medianoche perdida (fin de pausa, plantilla) se recupera al iniciar; tamaños del admin, traducciones",
+				"pl": "Poprawka: pominięta północ (koniec pauzy, szablon) jest nadrabiana przy starcie; rozmiary w adminie, tłumaczenia",
+				"uk": "Виправлення: пропущена північ (кінець паузи, шаблон) наздоганяється під час запуску; розміри в адмінці, переклади",
+				"zh-cn": "修复:启动时补做错过的午夜任务(结束暂停、恢复模板);管理界面尺寸、翻译"
+			},
 			"0.1.1": {
 				"en": "Fix: extra time above 60 minutes is sent in steps",
 				"de": "Fix: Zusatzzeit über 60 Minuten wird in Schritten gesendet",
@@ -85,18 +98,18 @@
 		"desc": {
 			"en": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
 			"de": "Nintendo Switch Kindersicherung überwachen und steuern (Spielzeit, Limits, Schlafenszeit)",
-			"ru": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
-			"pt": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
-			"nl": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
-			"fr": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
-			"it": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
-			"es": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
-			"pl": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
-			"uk": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)",
-			"zh-cn": "Monitor and control Nintendo Switch Parental Controls (play time, limits, bedtime)"
+			"ru": "Мониторинг и управление родительским контролем Nintendo Switch (время игры, лимиты, время сна)",
+			"pt": "Monitorize e controle o Controlo Parental da Nintendo Switch (tempo de jogo, limites, hora de dormir)",
+			"nl": "Beheer en bewaak het ouderlijk toezicht van de Nintendo Switch (speeltijd, limieten, bedtijd)",
+			"fr": "Surveillez et contrôlez le contrôle parental de la Nintendo Switch (temps de jeu, limites, heure du coucher)",
+			"it": "Monitora e controlla il controllo genitori di Nintendo Switch (tempo di gioco, limiti, ora di andare a letto)",
+			"es": "Supervisa y controla el control parental de Nintendo Switch (tiempo de juego, límites, hora de dormir)",
+			"pl": "Monitorowanie i sterowanie kontrolą rodzicielską Nintendo Switch (czas gry, limity, pora snu)",
+			"uk": "Моніторинг і керування батьківським контролем Nintendo Switch (час гри, ліміти, час сну)",
+			"zh-cn": "监控和控制 Nintendo Switch 家长控制（游戏时间、限制、就寝时间）"
 		},
 		"authors": [
-			"Henrik Schönhofen <henrik.schoenhofen@gmx.de>"
+			"Henrik Schönhofen <henrik.schoenhofen@icloud.com>"
 		],
 		"keywords": [
 			"nintendo",
