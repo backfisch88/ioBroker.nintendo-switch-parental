@@ -107,6 +107,7 @@ Every night shortly after midnight the adapter compares the rules at Nintendo wi
 ## Changelog
 
 ### **WORK IN PROGRESS**
+- (backfisch88) Fix: size attributes for all admin settings
 
 ### 0.1.1 (2026-11-16)
 - (backfisch88) Fix: extra time above 60 minutes is sent in steps

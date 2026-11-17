@@ -7,13 +7,21 @@
 			"text": "Nintendo Account login",
 			"size": 3,
 			"newLine": true,
-			"xs": 12
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
 		},
 		"_loginHelp": {
 			"type": "staticText",
 			"text": "loginHelp",
 			"newLine": true,
-			"xs": 12
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
 		},
 		"_loginLink": {
 			"type": "textSendTo",
@@ -22,7 +30,11 @@
 			"copyToClipboard": true,
 			"label": "Login link (alternative: copy and open in a browser)",
 			"newLine": true,
-			"xs": 12
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
 		},
 		"_getLoginUrl": {
 			"type": "sendTo",
@@ -34,7 +46,9 @@
 			"sm": 6,
 			"md": 4,
 			"openUrl": true,
-			"window": "Nintendo Login"
+			"window": "Nintendo Login",
+			"lg": 4,
+			"xl": 4
 		},
 		"redirectUrl": {
 			"type": "text",
@@ -42,7 +56,9 @@
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,
-			"md": 8
+			"md": 8,
+			"lg": 8,
+			"xl": 8
 		},
 		"_completeLogin": {
 			"type": "sendTo",
@@ -53,7 +69,9 @@
 			"newLine": true,
 			"xs": 12,
 			"sm": 6,
-			"md": 4
+			"md": 4,
+			"lg": 4,
+			"xl": 4
 		},
 		"sessionToken": {
 			"type": "password",
@@ -61,14 +79,20 @@
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,
-			"md": 8
+			"md": 8,
+			"lg": 8,
+			"xl": 8
 		},
 		"_settingsHeader": {
 			"type": "header",
 			"text": "Settings",
 			"size": 3,
 			"newLine": true,
-			"xs": 12
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
 		},
 		"pollInterval": {
 			"type": "number",
@@ -78,7 +102,9 @@
 			"newLine": true,
 			"xs": 12,
 			"sm": 6,
-			"md": 4
+			"md": 4,
+			"lg": 4,
+			"xl": 4
 		},
 		"timezone": {
 			"type": "text",
@@ -86,7 +112,9 @@
 			"help": "e.g. Europe/Berlin",
 			"xs": 12,
 			"sm": 6,
-			"md": 4
+			"md": 4,
+			"lg": 4,
+			"xl": 4
 		},
 		"language": {
 			"type": "text",
@@ -94,13 +122,19 @@
 			"help": "e.g. de-DE",
 			"xs": 12,
 			"sm": 6,
-			"md": 4
+			"md": 4,
+			"lg": 4,
+			"xl": 4
 		},
 		"createApplicationStates": {
 			"type": "checkbox",
 			"label": "Create states for each game (allow list, play time)",
 			"newLine": true,
-			"xs": 12
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
 		}
 	}
 }
