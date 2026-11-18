@@ -106,6 +106,9 @@ Every night shortly after midnight the adapter compares the rules at Nintendo wi
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+- (backfisch88) Fix: roles of `limit` and `addExtraTime` (`level`)
+
 ### 0.1.2 (2026-11-17)
 - (backfisch88) Fix: size attributes for all admin settings
 - (backfisch88) Fix: a missed midnight (pause end, template restore) is caught up at the next start
