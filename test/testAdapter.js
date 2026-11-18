@@ -529,6 +529,36 @@ describe('adapter with mocked cloud', () => {
 			await a.onUnload(() => {});
 		});
 
+		it('does not mark a night as done when the restore failed on the last attempt', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'saveTemplate', true);
+			await write(a, 'restoreDaily', true);
+			await a.setState('info.lastNightlyRun', { val: '2000-01-01', ack: true });
+			cloud.fail = 503;
+			await a.runDailyRestore(null, 3);
+			expect(a.states.get('info.lastNightlyRun')).to.equal('2000-01-01');
+			cloud.fail = null;
+			await a.runDailyRestore(null, 3);
+			expect(a.states.get('info.lastNightlyRun')).to.equal(L.zonedNow('Europe/Berlin').date);
+			await a.onUnload(() => {});
+		});
+
+		it('reads a console again at night only if something was changed', async () => {
+			const cloud = createCloud();
+			const a = await start({}, cloud);
+			await write(a, 'saveTemplate', true);
+			await write(a, 'restoreDaily', true);
+			const before = cloud.calls.length;
+			await a.runDailyRestore(null, 3);
+			// only the comparison with the template, no extra refresh
+			expect(cloud.calls.length - before).to.equal(1);
+			await write(a, 'limit', 30);
+			await a.runDailyRestore(null, 3);
+			expect(a.states.get('devices.D1.limit')).to.equal(90);
+			await a.onUnload(() => {});
+		});
+
 		it('loads the console list at night when the first poll failed', async () => {
 			const cloud = createCloud();
 			cloud.fail = 503;

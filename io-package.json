@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "nintendo-switch-parental",
-		"version": "0.1.2",
+		"version": "0.1.3",
 		"news": {
+			"0.1.3": {
+				"en": "Fix: roles of limit and addExtraTime; a failed nightly run is caught up at the next start",
+				"de": "Fix: Rollen von limit und addExtraTime; ein fehlgeschlagener nächtlicher Lauf wird beim nächsten Start nachgeholt",
+				"ru": "Исправление: роли limit и addExtraTime; неудавшийся ночной запуск выполняется при следующем старте",
+				"pt": "Correção: funções de limit e addExtraTime; uma execução noturna falhada é recuperada no próximo arranque",
+				"nl": "Fix: rollen van limit en addExtraTime; een mislukte nachtelijke run wordt bij de volgende start ingehaald",
+				"fr": "Correction : rôles de limit et addExtraTime ; une exécution nocturne échouée est rattrapée au prochain démarrage",
+				"it": "Correzione: ruoli di limit e addExtraTime; un'esecuzione notturna fallita viene recuperata al prossimo avvio",
+				"es": "Corrección: roles de limit y addExtraTime; una ejecución nocturna fallida se recupera en el próximo inicio",
+				"pl": "Poprawka: role limit i addExtraTime; nieudane nocne uruchomienie jest nadrabiane przy następnym starcie",
+				"uk": "Виправлення: ролі limit та addExtraTime; невдалий нічний запуск виконується під час наступного старту",
+				"zh-cn": "修复：limit 和 addExtraTime 的角色；失败的夜间运行将在下次启动时补做"
+			},
 			"0.1.2": {
 				"en": "Fix: missed midnight (pause end, template restore) is caught up at start; admin size attributes, translations",
 				"de": "Fix: verpasste Mitternacht (Pausenende, Template) wird beim Start nachgeholt; Admin-Größenangaben, Übersetzungen",

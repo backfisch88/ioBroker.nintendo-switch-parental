@@ -404,11 +404,14 @@ class NintendoSwitchParental extends utils.Adapter {
 			try {
 				const enabled = await this.getStateAsync(`devices.${dev}.restoreDaily`);
 				await this.runExclusive(async () => {
-					await this.resumePause(deviceId, dev, false);
-					if (!pausesOnly && enabled && enabled.val === true) {
-						await this.restoreTemplate(deviceId, dev);
+					const resumed = await this.resumePause(deviceId, dev, false);
+					const restored =
+						!pausesOnly && enabled && enabled.val === true
+							? await this.restoreTemplate(deviceId, dev)
+							: false;
+					if (resumed || restored) {
+						await this.refreshDevice(deviceId);
 					}
-					await this.refreshDevice(deviceId);
 				});
 			} catch (err) {
 				failed.push(dev);
@@ -429,7 +432,8 @@ class NintendoSwitchParental extends utils.Adapter {
 			}
 			return;
 		}
-		if (!pausesOnly && !this.unloaded && !this.pollingStopped) {
+		// a night that still failed after the last attempt is not marked as done, the next start catches it up
+		if (!pausesOnly && failed.length === 0 && !retryAll && !this.unloaded && !this.pollingStopped) {
 			await this.setState('info.lastNightlyRun', { val: L.zonedNow(this.timezone).date, ack: true });
 		}
 	}
