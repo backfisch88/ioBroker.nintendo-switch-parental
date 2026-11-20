@@ -106,6 +106,9 @@ Every night shortly after midnight the adapter compares the rules at Nintendo wi
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+- (backfisch88) Change: debug log lists the times reported for a console
+
 ### 0.1.3 (2026-11-18)
 - (backfisch88) Fix: roles of `limit` and `addExtraTime` (`level`)
 - (backfisch88) Fix: a nightly run that failed on the last attempt is caught up at the next start

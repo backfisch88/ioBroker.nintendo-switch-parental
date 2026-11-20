@@ -239,3 +239,20 @@ describe('template helpers', () => {
 		expect(back.dailyRegulations.timeToPlayInOneDay).to.deep.equal(setting);
 	});
 });
+
+describe('timeFields', () => {
+	it('lists only timestamps with their path', () => {
+		const out = L.timeFields({
+			label: 'Kid',
+			device: { synchronizedParentalControlSetting: { synchronizedAt: 1794816165 }, count: 5 },
+			seen: '2026-11-20T10:00:00Z',
+			ms: 1794816165000,
+		});
+		expect(out).to.deep.equal([
+			'device.synchronizedParentalControlSetting.synchronizedAt=2026-11-16T08:02:45.000Z',
+			'seen=2026-11-20T10:00:00Z',
+			'ms=2026-11-16T08:02:45.000Z',
+		]);
+		expect(L.timeFields(undefined)).to.deep.equal([]);
+	});
+});

@@ -495,6 +495,9 @@ class NintendoSwitchParental extends utils.Adapter {
 			this.requireApi().fetchParentalControlSetting(deviceId),
 			this.requireApi().fetchDailySummaries(deviceId),
 		]);
+		this.log.debug(
+			`Times reported for a console: ${L.timeFields(pcsResponse.ownedDevice || entry).join(', ') || 'none'}`,
+		);
 		const snapshot = L.buildSnapshot({
 			owned: pcsResponse.ownedDevice || entry || { deviceId },
 			pcsResponse,
