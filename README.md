@@ -55,7 +55,8 @@ Per console under `devices.<deviceId>`:
 | State | Access | Description |
 |-------|--------|-------------|
 | `name`, `model`, `firmware` | R | Console label, model (Switch / Switch 2) and firmware |
-| `lastSync` | R | Last time the console synced with Nintendo |
+| `lastSync` | R | Last time the console synced its settings with Nintendo |
+| `lastUpdate` | R | Last time the adapter got fresh data from Nintendo |
 | `playTimeToday` | R | Minutes played today (all players) |
 | `timeRemaining` | R | Minutes left today, considers limit, extra time and bedtime |
 | `playTimeMonth` | R | Minutes played this month |
@@ -107,7 +108,8 @@ Every night shortly after midnight the adapter compares the rules at Nintendo wi
 ## Changelog
 
 ### **WORK IN PROGRESS**
-- (backfisch88) Change: debug log lists the times reported for a console
+- (backfisch88) New: `lastUpdate` shows when the adapter last got data from Nintendo
+- (backfisch88) Change: `lastSync` is described as the last settings sync of the console
 
 ### 0.1.3 (2026-11-18)
 - (backfisch88) Fix: roles of `limit` and `addExtraTime` (`level`)

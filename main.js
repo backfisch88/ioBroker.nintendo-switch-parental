@@ -34,7 +34,8 @@ const DEVICE_STATES = [
 	{ id: 'name', name: 'Console name', type: 'string', role: 'text', get: s => s.name },
 	{ id: 'model', name: 'Console model', type: 'string', role: 'text', get: s => s.model },
 	{ id: 'firmware', name: 'Firmware version', type: 'string', role: 'text', get: s => s.firmware },
-	{ id: 'lastSync', name: 'Last sync with Nintendo', type: 'number', role: 'date', get: s => s.lastSync },
+	{ id: 'lastSync', name: 'Last settings sync of the console', type: 'number', role: 'date', get: s => s.lastSync },
+	{ id: 'lastUpdate', name: 'Last update from Nintendo', type: 'number', role: 'date', get: s => s.updatedAt },
 	{
 		id: 'playTimeToday',
 		name: 'Play time today',
@@ -495,9 +496,6 @@ class NintendoSwitchParental extends utils.Adapter {
 			this.requireApi().fetchParentalControlSetting(deviceId),
 			this.requireApi().fetchDailySummaries(deviceId),
 		]);
-		this.log.debug(
-			`Times reported for a console: ${L.timeFields(pcsResponse.ownedDevice || entry).join(', ') || 'none'}`,
-		);
 		const snapshot = L.buildSnapshot({
 			owned: pcsResponse.ownedDevice || entry || { deviceId },
 			pcsResponse,
@@ -505,6 +503,7 @@ class NintendoSwitchParental extends utils.Adapter {
 			now: L.zonedNow(this.timezone),
 		});
 		snapshot.id = deviceId;
+		snapshot.updatedAt = Date.now();
 		await this.publishDevice(snapshot);
 	}
 

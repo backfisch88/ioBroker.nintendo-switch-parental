@@ -529,6 +529,14 @@ describe('adapter with mocked cloud', () => {
 			await a.onUnload(() => {});
 		});
 
+		it('publishes the time of the last update', async () => {
+			const before = Date.now();
+			const a = await start({}, createCloud());
+			expect(a.states.get('devices.D1.lastUpdate')).to.be.within(before, Date.now());
+			expect(a.objects.get('devices.D1.lastUpdate').common).to.include({ role: 'date', read: true, write: false });
+			await a.onUnload(() => {});
+		});
+
 		it('does not mark a night as done when the restore failed on the last attempt', async () => {
 			const cloud = createCloud();
 			const a = await start({}, cloud);
