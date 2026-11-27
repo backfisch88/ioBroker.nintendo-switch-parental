@@ -107,7 +107,7 @@ Every night shortly after midnight the adapter compares the rules at Nintendo wi
 
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 0.1.5 (2026-11-27)
 - (backfisch88) Fix: Nintendo rejected the old app version (`update_required`), now sends 2.7.0 (740)
 - (backfisch88) New: `lastUpdate` shows when the adapter last got data from Nintendo
 - (backfisch88) Change: `lastSync` is described as the last settings sync of the console

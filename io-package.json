@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "nintendo-switch-parental",
-		"version": "0.1.3",
+		"version": "0.1.5",
 		"news": {
+			"0.1.5": {
+				"en": "Fix: Nintendo app version 2.7.0 (update_required); new state lastUpdate",
+				"de": "Fix: Nintendo App-Version 2.7.0 (update_required); neuer State lastUpdate",
+				"ru": "Исправление: версия приложения Nintendo 2.7.0 (update_required); новое состояние lastUpdate",
+				"pt": "Correção: versão 2.7.0 da app Nintendo (update_required); novo estado lastUpdate",
+				"nl": "Fix: Nintendo-appversie 2.7.0 (update_required); nieuwe state lastUpdate",
+				"fr": "Correction : version 2.7.0 de l'app Nintendo (update_required) ; nouvel état lastUpdate",
+				"it": "Correzione: versione 2.7.0 dell'app Nintendo (update_required); nuovo stato lastUpdate",
+				"es": "Corrección: versión 2.7.0 de la app de Nintendo (update_required); nuevo estado lastUpdate",
+				"pl": "Poprawka: wersja aplikacji Nintendo 2.7.0 (update_required); nowy stan lastUpdate",
+				"uk": "Виправлення: версія застосунку Nintendo 2.7.0 (update_required); новий стан lastUpdate",
+				"zh-cn": "修复：Nintendo 应用版本 2.7.0（update_required）；新增状态 lastUpdate"
+			},
 			"0.1.3": {
 				"en": "Fix: roles of limit and addExtraTime; a failed nightly run is caught up at the next start",
 				"de": "Fix: Rollen von limit und addExtraTime; ein fehlgeschlagener nächtlicher Lauf wird beim nächsten Start nachgeholt",
